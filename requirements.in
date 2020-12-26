@@ -1,2 +1,7 @@
-pycountry
+beautifulsoup4
+black
 pandas
+pycountry
+pyproj
+pyshp
+

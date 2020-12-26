@@ -3,6 +3,7 @@ import math
 import pyproj
 import shapefile
 import pprint
+import math
 import json
 from collections import defaultdict, Counter
 
@@ -11,14 +12,7 @@ CC_CODES = {
   'Western Sahara': 'eh',
 }
 
-EXTRA_BRIDGES = [
-  ('es', 'ma'),
-  ('tn', 'it'),
-  ('tr', 'gr'),
-  ('se', 'dk'),
-  ('ry', 'so'),
-  ('nz', 'au'),
-]
+EXTRA_BRIDGES = []
 
 def calc_area(pts):
   n = len(pts) # of corners
@@ -32,7 +26,7 @@ def calc_area(pts):
 
 MAGIC_MOLL_NUMBER = 9020047.848073646
 SRC_PROJ = pyproj.Proj(proj='longlat', ellps='WGS84', datum='WGS84')
-DST_PROJ = pyproj.Proj(proj='moll', lon_0=0, x_0=0, y_0=0, ellps='WGS84', datum='WGS84', units='m')
+DST_PROJ = pyproj.Proj(proj='moll', lon_0=-70, x_0=0, y_0=0, ellps='WGS84', datum='WGS84', units='m')
 
 def project_point(pt):
   x, y = pyproj.transform(SRC_PROJ, DST_PROJ, pt[0], pt[1])
@@ -79,15 +73,8 @@ def distance_squared(pt1, pt2):
   dy = pt1[1] - pt2[1]
   return dx * dx * 4 + dy * dy
 
-
-def remove_guyana(shapes, cc):
-  if cc != 'fr':
-    return shapes
-  return [shape for shape in shapes if shape['x'] > 0.4]
-
-
 def main():
-  r = shapefile.Reader('data/ne_110m_admin_0_countries')
+  r = shapefile.Reader('data/cb_2015_us_state_20m')
   labels = [x[0] for x in r.fields]
   all_points = []
   all_points_index = {}
@@ -107,22 +94,13 @@ def main():
 
   total_size = sum(sizes)
   recs = [dict(zip(labels, x)) for x in r.records()]
-  for rec in recs:
-    cc = rec['un_a3']
-    if not cc or cc == '-99':
-      cc = rec['fips_10']
-    if not cc or cc == '-99':
-      cc = CC_CODES.get(rec['name'])
-    else:
-      cc = cc.lower()
-    rec['cc'] = cc
 
   point_to_shape = {}
   for idx, shapes in enumerate(indexed_shapes):
-    cc = recs[idx]['cc']
+    geoid = recs[idx]['GEOID']
     for shape in shapes:
       for pt in shape['pts']:
-        point_to_shape[pt] = (cc, shape)
+        point_to_shape[pt] = (geoid, shape)
 
   # Find for islands nearby anchors.
   # This doesn't make too much sense since we're in a non distance preserving
@@ -133,9 +111,9 @@ def main():
     geo_index[int(500 * pt[1]) * 500 + int(500 * pt[0])].append((idx, pt, point_to_shape[idx]))
 
   for idx, shapes in enumerate(indexed_shapes):
-    cc = recs[idx]['cc']
+    geoid = recs[idx]['GEOID']
     for shape in shapes:
-      if shape['island'] or cc == 'ie':
+      if shape['island']:
         min_x = min(all_points[p][0] for p in shape['pts'])
         max_x = max(all_points[p][0] for p in shape['pts'])
         min_y = min(all_points[p][1] for p in shape['pts'])
@@ -170,19 +148,17 @@ def main():
             bridges.append((idx, pt, pt_cc))
         shape['bridges'] = [(idx, pt[0] - shape['x'], pt[1] - shape['y'], pt_cc) for idx, pt, pt_cc in bridges]
 
-  countries = [{'name': str(rec['name']),
-                'cc': rec['cc'],
-                'shapes': remove_guyana(shapes, rec['cc']),
-                'region': str(rec['region_un']),
-                'continent': str(rec['continent']),
+  countries = [{'name': str(rec['STUSPS']),
+                'cc': rec['GEOID'],
+                'shapes': shapes,
                 'weight': size / total_size}
                for rec, shapes, size in zip(recs, indexed_shapes, sizes)
-               if rec['cc']]
+               if rec['GEOID'] and not rec['GEOID'] == 'PR']
 
-  countries_by_cc = {country['cc']: country for country in countries}
+  states_by_code = {country['cc']: country for country in countries}
   for cc1, cc2 in EXTRA_BRIDGES:
-    country1 = countries_by_cc[cc1]
-    country2 = countries_by_cc[cc2]
+    country1 = states_by_code[cc1]
+    country2 = states_by_code[cc2]
     shape1 = max(country1['shapes'], key=lambda shape:shape['area'])
     shape2 = max(country2['shapes'], key=lambda shape:shape['area'])
     if shape1['area'] < shape2['area']:
@@ -195,12 +171,15 @@ def main():
     shape1['bridges'].append((pt_idx, x - shape1['x'], y - shape1['y'], country1['cc']))
 
 
-  with open('data/countries.py', 'w') as fout:
-    fout.write('COUNTRIES=' + pprint.pformat(countries) + '\n' +
-               'POINT_INDEX=' + pprint.pformat(all_points) + '\n'
-    )
-  with open('data/countries.js', 'w') as fout:
-    fout.write('COUNTRIES=' + json.dumps(countries, indent=2) + ';\n' +
+  min_x = min(x for x, y in all_points)
+  min_y = min(y for x, y in all_points)
+  max_x = max(x for x, y in all_points)
+  max_y = max(y for x, y in all_points)
+
+  all_points = [(0.1 + 0.8 * (x - min_x) / (max_x - min_x), 0.1 + 0.8 * (y - min_y) / (max_y - min_y)) for x, y in all_points]
+
+  with open('data/states.js', 'w') as fout:
+    fout.write('STATES=' + json.dumps(countries, indent=2) + ';\n' +
                'POINT_INDEX=' + json.dumps(all_points, indent=2) + ';\n'
     )
 

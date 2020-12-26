@@ -56,7 +56,7 @@ WorldSizer.prototype = {
     },
 
     draw: function (canvas) {
-        coos_for_pts = this.currentState();
+        var coos_for_pts = this.currentState();
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.strokeStyle = '#303030';
@@ -94,7 +94,7 @@ WorldSizer.prototype = {
         return Math.abs(area) / 2;
     },
 
-    iterate: function () {
+    tick: function () {
         var currentState = this.currentState();
         var deltas = [];
         for (ci = 0; ci < this.countries.length; ci++) {

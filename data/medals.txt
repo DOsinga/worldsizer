@@ -1,0 +1,142 @@
+1	United States	2827
+2	Soviet Union	1204
+3	Germany	992
+4	Great Britain	876
+5	France	836
+6	Italy	702
+7	Sweden	652
+8	China	605
+9	Russian Federation	586
+10	Norway	521
+11	East Germany	519
+12	Australia	511
+13	Canada	499
+14	Hungary	498
+15	Japan	497
+16	Finland	470
+17	Netherlands	415
+18	Switzerland	344
+19	South Korea	334
+20	Austria	319
+21	Romania	307
+22	Poland	304
+23	West Germany	243
+24	Bulgaria	223
+25	Cuba	219
+26	Denmark	195
+27	Czechoslovakia	168
+28	Belgium	154
+29	Spain	151
+30	Ukraine	135
+31	Brazil	127
+32	New Zealand	120
+33	Greece	116
+34	Belarus	105
+35	Kenya	99
+36	Turkey	95
+37	Yugoslavia	94
+38	South Africa	86
+39	Czech Republic	84
+40	Jamaica	78
+41	Kazakhstan	77
+42	Argentina	74
+43	Iran	68
+44	Mexico	67
+45	North Korea	56
+46	Ethiopia	53
+47	Croatia	44
+48	Azerbaijan	44
+49	Estonia	41
+50	Slovenia	40
+51	Slovakia	36
+52	Uzbekistan	35
+53	Georgia	32
+54	Ireland	31
+55	Thailand	30
+56	Indonesia	30
+57	Egypt	29
+58	India	28
+59	Colombia	27
+60	Latvia	27
+61	Mongolia	26
+62	Lithuania	25
+63	Taiwan	24
+64	Portugal	24
+65	Nigeria	24
+66	Morocco	23
+67	Trinidad and Tobago	19
+68	Algeria	17
+69	Armenia	16
+70	Venezuela	15
+71	Serbia	15
+72	Bahamas	13
+73	Chile	13
+74	Tunisia	13
+75	Australasia	12
+76	Malaysia	11
+77	Pakistan	10
+78	Uruguay	10
+79	Liechtenstein	10
+80	Philippines	10
+81	Israel	9
+82	Puerto Rico	9
+83	Zimbabwe	8
+84	Moldova	8
+85	Dominican Republic	7
+86	Uganda	7
+87	Cameroon	5
+88	Singapore	5
+89	Qatar	5
+90	Bahrain	4
+91	Peru	4
+92	Luxembourg	4
+93	Vietnam	4
+94	Kuwait	4
+95	Lebanon	4
+96	Costa Rica	4
+97	Iceland	4
+98	Ghana	4
+99	Tajikistan	4
+100	Namibia	4
+101	Panama	3
+102	Côte d'Ivoire	3
+103	Kyrgyzstan	3
+104	Hong Kong	3
+105	Saudi Arabia	3
+106	Syria	3
+107	United Arab Emirates	2
+108	Mozambique	2
+109	Afghanistan	2
+110	Burundi	2
+111	Haiti	2
+112	Suriname	2
+113	Serbia and Montenegro	2
+114	Grenada	2
+115	Ecuador	2
+116	Netherlands Antilles	2
+117	Tanzania	2
+118	Zambia	2
+119	Sri Lanka	2
+120	Niger	2
+121	Botswana	1
+122	Kosovo	1
+123	Cyprus	1
+124	Paraguay	1
+125	Montenegro	1
+126	Mauritius	1
+127	Togo	1
+128	Tonga	1
+129	Jordan	1
+130	Fiji	1
+131	Barbados	1
+132	Iraq	1
+133	Bermuda	1
+134	Guatemala	1
+135	Gabon	1
+136	Guyana	1
+137	Virgin Islands	1
+138	Djibouti	1
+139	Sudan	1
+140	Macedonia	1
+141	Senegal	1
+142	Eritrea	1

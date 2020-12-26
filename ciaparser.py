@@ -128,7 +128,7 @@ def main():
         for k in countries[cc]:
           counts[k] += 1
   with open('data/cia_data.js', 'w') as fout:
-    fout.write('CIA_DATA=' + json.dumps(countries, indent=2))
+    fout.write(json.dumps(countries, indent=2))
 
   print('Countries:', len(countries))
   for k, v in counts.most_common():

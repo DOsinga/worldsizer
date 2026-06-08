@@ -1,0 +1,215 @@
+<script type="text/markdown" id="info">
+name: World Sizer
+description: >
+  What does the world look like if we size the countries according to the number of people living there? GDP? Size of the military? This project allows you to explore the world in a different way.
+github: worldsizer
+pass_on_request: ['state']
+</script>
+
+<style>
+table#lowest_highest {
+    font-size:16px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+#lowest_highest td, #lowest_highest th {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+}
+
+#lowest_highest tr:nth-child(even){background-color: #f2f2f2}
+
+#lowest_highest th {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #e6e3d9;
+    color: white;
+}
+</style>
+
+<script type="text/javascript" src="{{ static }}countries_006.js"></script>
+<script type="text/javascript" src="{{ static }}country_data.js"></script>
+<script type="text/javascript" src="{{ static }}worldsizer.js"></script>
+
+
+<script type="text/javascript">
+    var worldSizer;
+    var currentState;
+
+    function countryWeights(src, property, correctForDensity) {
+        res = {};
+        sum = 0;
+        for (var key1 in src) {
+            if (src.hasOwnProperty(key1) && src[key1][property] !== undefined) {
+                res[key1] = src[key1][property];
+                if (correctForDensity && src[key1]["Population"]) {
+                    if (!src[key1]["Population"] ||  !src[key1]["Area"]) {
+                        console.log('~~', key1);
+                    }
+                    res[key1] /= (src[key1]["Population"] / src[key1]["Area"]);
+                }
+                sum += res[key1];
+            }
+        }
+        for (var key2 in res) {
+            if (res.hasOwnProperty(key2)) {
+                res[key2] /= sum;
+            }
+        }
+        return res;
+    }
+
+    function unwindToArea(callback) {
+        var canvas = document.getElementById('worldmap');
+        function animate() {
+            worldSizer.draw(canvas, 75);
+            if (worldSizer.iterations.length > 1) {
+                worldSizer.unWind();
+                setTimeout(animate, 10);
+            } else {
+                callback();
+            }
+        }
+        animate();
+    }
+
+    function animateTo(newState, callback, correctForDensity) {
+        targetWeights = countryWeights(COUNTRY_DATA, newState, correctForDensity);
+        worldSizer.setTargetWeights(targetWeights);
+        var canvas = document.getElementById('worldmap');
+        function animate() {
+            worldSizer.draw(canvas, 75);
+            if (worldSizer.iterations.length < 300) {
+                worldSizer.tick();
+                setTimeout(animate, 10);
+            } else {
+                callback();
+            }
+        }
+        animate();
+    }
+
+    function changeStateTo(newState, correctForDensity, callback) {
+        nestedCallback = function() {
+            currentState = newState;
+            if (callback) {
+                callback();
+            }
+        };
+        if (newState == currentState) {
+            nestedCallback();
+            return;
+        }
+        if (newState == 'Area') {
+            unwindToArea(nestedCallback);
+        } else {
+            if (currentState != 'Area') {
+                unwindToArea(function() {
+                    animateTo(newState, nestedCallback, correctForDensity);
+                })
+            } else {
+                animateTo(newState, nestedCallback, correctForDensity);
+            }
+        }
+    }
+
+    function loadTable(properties, property) {
+        var data = [];
+        for (var i = 0; i < COUNTRIES.length; i ++) {
+            var country = COUNTRIES[i];
+            var props = properties[country.cc];
+            if (props && props[property] > 1) {
+                data.push([country.name, props[property]]);
+            }
+        }
+
+        data = data.sort(function (c1, c2) {
+            return c2[1] - c1[1];
+        });
+
+        $.each($('#lowest_highest td'), function(idx, cell) {
+            var row = Math.floor(idx / 4);
+            var col = idx % 4;
+            if (col >= 2) {
+                row = data.length - 1 - row;
+            }
+            col %= 2;
+            var val = data[row][col];
+            if (col === 1) {
+                val = Math.round(val);
+            }
+            $(cell).text(val);
+        });
+        return data;
+    }
+
+    $(function () {
+        var canvas = document.getElementById('worldmap');
+        // var north_america = COUNTRIES.filter(c => c.continent == 'Americas');
+        worldSizer = new WorldSizer(POINT_INDEX, COUNTRIES);
+        loadTable(COUNTRY_DATA, 'Area');
+        worldSizer.draw(canvas, 75);
+        currentState = $("#measurement").val();
+
+        function onMeasurementChanged() {
+            var newState = $("#measurement").val();
+            loadTable(COUNTRY_DATA, newState);
+            history.pushState({'newState': newState}, newState, '?state=' + encodeURIComponent(newState));
+            $('#measurement').prop('disabled', 'disabled');
+            changeStateTo(newState, $('#correctForDensity').is(':checked'), function() {
+                $('#measurement').prop('disabled', false);
+            });
+        }
+
+        $("#measurement").on('change', onMeasurementChanged);
+        $("#correctForDensity").on('change', onMeasurementChanged);
+
+        {% if state %}
+        $('#measurement').val('{{ state|safe }}').change();
+        {% endif %}
+    });
+</script>
+
+<P>
+    To learn more, check out the corresponding <a href="http://blog.douweosinga.com/2016/10/worldsizer.html">blog post</a>.
+</P>
+<P>
+    <label for="measurement">Pick a measurement to resize the map accordingly:</label>
+    <select id="measurement">
+        <option value="Area">Area</option>
+        <option value="Population">Population</option>
+        <option value="Carbon Emissions">CO2 emissions</option>
+        <option value="Army Size">Active Army Size</option>
+        <option value="GDP (official exchange rate)">GDP (Exchange Rate)</option>
+        <option value="Living with Aids">Li                  ving with AIDS</option>
+        <option value="Exports">Exports</option>
+        <option value="Alcohol Consumption">Alcohol Consumption</option>
+        <option value="Land use">Productive Land Area</option>
+        <option value="Labor force">Labor force</option>
+        <option value="Olympic Medals">Olympic Medals Won</option>
+    </select>
+    <br/>
+    <label for="correctForDensity">Check here to compensate for population density.</label>
+    <input type="checkbox" id="correctForDensity" checked>
+    <br/>
+    When sizing countries according to measurements that correlate with population, denser
+    populated places show up bigger even though that might just because there are more people.
+    Use this checkbox to correct for that.
+</P>
+
+<p style="text-align: center">
+    <canvas id="worldmap" width="720" height="540" style="background-color: #7785C0" class="media-container"></canvas>
+    <br/><em>Projection: <a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide</a></em>
+</p>
+
+<table id="lowest_highest">
+    <tr><th colspan="2">Top 5</th><th colspan="2">Bottom 5</th></tr>
+    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
+    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
+    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
+    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
+    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
+</table>

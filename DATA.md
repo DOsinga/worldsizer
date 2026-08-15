@@ -2,13 +2,21 @@
 
 ## Geometry
 
-`static/geometry.json` is `world-006`, generated from Natural Earth geometry by
-`worldparser.py`. It contains 175 country records and 7,491 shared points in a
-Mollweide projection.
+`static/geometry.json` is the canonical snapshot generated from Natural Earth
+geometry by the original 2020 pipeline. `worldparser.py` reproduces its 175
+country records, topology, bridges, and 7,491 shared points in a Mollweide
+projection. Current projection libraries differ from the snapshot by at most
+2e-15 in normalized coordinates; the tolerance is covered by a test.
 
-The earlier numbered geometry files used the same polygons and points. The
-canonical version adds three solver bridges connecting Senegal to Brazil,
-Italy to Spain, and Iran to Qatar.
+The geometry version is derived from a hash of its countries and points. Any
+geometry change therefore requires matching frames instead of silently passing
+the player's compatibility check.
+
+The earlier numbered geometry files used the same polygons and points. Their
+last topology change added solver bridges connecting Senegal to Brazil, Italy
+to Spain, and Iran to Qatar. The current solver geometry also anchors Iceland
+to Great Britain, ties Lesotho's shared inner ring to South Africa's outer
+ring.
 
 ## Population timeline
 
@@ -29,7 +37,8 @@ case to `baseline/data_audit.json` so it cannot pass unnoticed.
 
 `static/population_frames.json` contains the shipped 1800–2100 frames. They are
 preserved as the visual baseline even though their original generation harness
-is missing.
+is missing. They render against the canonical geometry but record
+`solverBridges: legacy` because they retain the earlier bridge configuration.
 
 ## World Sizer measurements
 
@@ -51,7 +60,6 @@ The baseline measurement paths run the ported solver for 299 ticks, matching
 the old browser loop's initial history frame plus 299 generated frames. Five
 checkpoints per path keep the compressed frame bundle below the 1 MB budget.
 
-`data/data_issues.json` records values corrected during the legacy import.
-Currently this contains Somalia's empty-string `Living with Aids` value, which
-is treated as missing. Leaving the empty string in place makes JavaScript turn
-the normalization sum into string concatenation.
+`data/data_issues.json` records values corrected or ignored during the legacy
+import. The audit also reports every non-numeric value, including values in
+fields that are not offered by the site.

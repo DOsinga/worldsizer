@@ -21,23 +21,19 @@ class CartogramPlayer {
         return points.map(point => [point[0] / scale, point[1] / scale]);
     }
 
-    static decodePaths(dataset, basePoints) {
-        const paths = {};
-        for (const [name, encodedFrames] of Object.entries(dataset.paths)) {
-            let previous = basePoints.map(point => [
-                Math.round(point[0] * dataset.scale),
-                Math.round(point[1] * dataset.scale)
+    static decodePath(encodedFrames, basePoints, scale) {
+        let previous = basePoints.map(point => [
+            Math.round(point[0] * scale),
+            Math.round(point[1] * scale)
+        ]);
+        return encodedFrames.map(encoded => {
+            const current = previous.map((point, index) => [
+                point[0] + encoded[index * 2],
+                point[1] + encoded[index * 2 + 1]
             ]);
-            paths[name] = encodedFrames.map(encoded => {
-                const current = previous.map((point, index) => [
-                    point[0] + encoded[index * 2],
-                    point[1] + encoded[index * 2 + 1]
-                ]);
-                previous = current;
-                return CartogramPlayer.scaledPoints(current, dataset.scale);
-            });
-        }
-        return paths;
+            previous = current;
+            return CartogramPlayer.scaledPoints(current, scale);
+        });
     }
 
     setPoints(points) {

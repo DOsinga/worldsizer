@@ -5,6 +5,8 @@ import shapefile
 import json
 from collections import defaultdict, Counter
 
+from cartogram import geometry_version
+
 CC_CODES = {
     'Taiwan': 'tw',
     'Western Sahara': 'eh',
@@ -22,6 +24,9 @@ EXTRA_BRIDGES = [
     ('ry', 'so'),
     ('nz', 'au'),
 ]
+
+ISLAND_ANCHORS = {'is': 'gb'}
+ENCLAVES = {'ls': 'za'}
 
 
 def calc_area(pts):
@@ -108,8 +113,20 @@ def remove_french_guiana(shapes, cc):
     return [shape for shape in shapes if shape['x'] > 0.4]
 
 
-def main():
-    r = shapefile.Reader('data/ne_110m_admin_0_countries', encoding='latin1')
+def add_bridge(shape, anchor_shapes, points, country_code):
+    shape_center = (shape['x'], shape['y'])
+    point_index = min(
+        (point_index for anchor in anchor_shapes for point_index in anchor['pts']),
+        key=lambda index: distance_squared(shape_center, points[index]),
+    )
+    x, y = points[point_index]
+    shape['bridges'].append(
+        (point_index, x - shape['x'], y - shape['y'], country_code)
+    )
+
+
+def build_geometry(source='data/ne_110m_admin_0_countries'):
+    r = shapefile.Reader(source, encoding='latin1')
     labels = [x[0] for x in r.fields]
     all_points = []
     all_points_index = {}
@@ -226,6 +243,27 @@ def main():
     ]
 
     countries_by_cc = {country['cc']: country for country in countries}
+
+    for island_code, anchor_code in ISLAND_ANCHORS.items():
+        island = max(countries_by_cc[island_code]['shapes'], key=lambda shape: shape['area'])
+        island['bridges'] = []
+        add_bridge(
+            island,
+            countries_by_cc[anchor_code]['shapes'],
+            all_points,
+            anchor_code,
+        )
+
+    for enclave_code, container_code in ENCLAVES.items():
+        enclave = max(countries_by_cc[enclave_code]['shapes'], key=lambda shape: shape['area'])
+        container_shapes = countries_by_cc[container_code]['shapes']
+        inner_ring = next(
+            shape for shape in container_shapes
+            if set(shape['pts']) == set(enclave['pts'])
+        )
+        outer_ring = max(container_shapes, key=lambda shape: shape['area'])
+        add_bridge(inner_ring, [outer_ring], all_points, container_code)
+
     for cc1, cc2 in EXTRA_BRIDGES:
         country1 = countries_by_cc[cc1]
         shape1 = max(country1['shapes'], key=lambda shape: shape['area'])
@@ -242,15 +280,17 @@ def main():
         )
         x, y = all_points[pt_idx]
         shape1['bridges'].append(
-            (pt_idx, x - shape1['x'], y - shape1['y'], country1['cc'])
+            (pt_idx, x - shape1['x'], y - shape1['y'], country2['cc'])
         )
 
+    geometry = {"countries": countries, "points": all_points}
+    geometry["version"] = geometry_version(geometry)
+    return geometry
+
+
+def main():
     with open('static/geometry.json', 'w') as fout:
-        json.dump(
-            {"version": "world-006", "countries": countries, "points": all_points},
-            fout,
-            separators=(",", ":"),
-        )
+        json.dump(build_geometry(), fout, separators=(",", ":"))
 
 
 if __name__ == '__main__':

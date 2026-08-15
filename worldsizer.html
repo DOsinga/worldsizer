@@ -194,13 +194,16 @@ blog: 2016/1021
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', async function () {
+    async function initializeWorldSizer() {
         const staticRoot = '{% static "projects/worldsizer/" %}';
         const [geometryResponse, pathsResponse, measurementsResponse] = await Promise.all([
             fetch(staticRoot + 'geometry.json'),
             fetch(staticRoot + 'measurement_paths.json'),
             fetch(staticRoot + 'measurements.json')
         ]);
+        if (![geometryResponse, pathsResponse, measurementsResponse].every(response => response.ok)) {
+            throw new Error('One or more cartogram files could not be loaded');
+        }
         const geometry = await geometryResponse.json();
         const pathData = await pathsResponse.json();
         const measurements = await measurementsResponse.json();
@@ -212,7 +215,7 @@ blog: 2016/1021
             fit: true,
             margin: 75
         });
-        const paths = CartogramPlayer.decodePaths(pathData, geometry.points);
+        const paths = new Map();
         const countryNames = new Map(geometry.countries.map(country => [country.cc, country.name]));
         const select = document.getElementById('measurement');
         const density = document.getElementById('correct-density');
@@ -223,6 +226,15 @@ blog: 2016/1021
 
         function keyFor(field) {
             return field === 'Area' ? field : field + (density.checked ? ':density' : '');
+        }
+
+        function pathFor(key) {
+            if (!paths.has(key)) {
+                paths.set(key, CartogramPlayer.decodePath(
+                    pathData.paths[key], geometry.points, pathData.scale
+                ));
+            }
+            return paths.get(key);
         }
 
         function updateTable(field) {
@@ -256,9 +268,9 @@ blog: 2016/1021
 
             const sequence = [];
             if (currentKey !== 'Area') {
-                sequence.push(...paths[currentKey].slice(0, -1).reverse(), geometry.points);
+                sequence.push(...pathFor(currentKey).slice(0, -1).reverse(), geometry.points);
             }
-            if (targetKey !== 'Area') sequence.push(...paths[targetKey]);
+            if (targetKey !== 'Area') sequence.push(...pathFor(targetKey));
             await player.animateSequence(sequence, 110);
             currentKey = targetKey;
             status.textContent = field === 'Area' ? 'Geographic area' : 'Area represents ' + select.options[select.selectedIndex].text.toLowerCase();
@@ -278,5 +290,14 @@ blog: 2016/1021
             select.value = initialState;
             if (initialState !== 'Area') await changeMeasurement();
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeWorldSizer().catch(error => {
+            console.error(error);
+            const status = document.getElementById('worldsizer-status');
+            status.textContent = 'Unable to load the cartogram data';
+            status.setAttribute('role', 'alert');
+        });
     });
 </script>

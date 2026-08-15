@@ -1,3 +1,5 @@
+import hashlib
+import json
 import math
 from statistics import median
 
@@ -11,6 +13,16 @@ COLORS = {
     "Oceania": "#00AFAF",
     "Seven seas (open ocean)": "#AFAF00",
 }
+
+
+def geometry_version(geometry):
+    content = json.dumps(
+        {"countries": geometry["countries"], "points": geometry["points"]},
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode()
+    return f"world-{hashlib.sha256(content).hexdigest()[:12]}"
 
 
 def normalized_weights(data, field, density=False):
@@ -32,6 +44,8 @@ def normalized_weights(data, field, density=False):
 
 def population_weights(data, year):
     index = year - 1800
+    if not 0 <= index <= 300:
+        raise ValueError(f"population year is outside 1800-2100: {year}")
     weights = {
         country_code: values[index]
         for country_code, values in data.items()
@@ -110,15 +124,15 @@ class Cartogram:
                 center_y = sum(self.points[index][1] for index in shape_points) / len(shape_points)
                 home_x = shape["x"] - center_x
                 home_y = shape["y"] - center_y
-                bridge_x = 0.0
-                bridge_y = 0.0
+                bridge_sum_x = 0.0
+                bridge_sum_y = 0.0
 
-                for bridge in shape["bridges"]:
-                    if bridge[3] not in self.country_codes:
+                for anchor_index, offset_x, offset_y, country_code in shape["bridges"]:
+                    if country_code not in self.country_codes:
                         continue
-                    anchor = self.points[bridge[0]]
-                    bridge_x -= bridge[1] * target_sqrt - (anchor[0] - center_x)
-                    bridge_y -= bridge[2] * target_sqrt - (anchor[1] - center_y)
+                    anchor_x, anchor_y = self.points[anchor_index]
+                    bridge_sum_x -= offset_x * target_sqrt - (anchor_x - center_x)
+                    bridge_sum_y -= offset_y * target_sqrt - (anchor_y - center_y)
 
                 current_area = polygon_area(shape_points, self.points)
                 if current_area == 0 and multiplier == 0:
@@ -128,19 +142,30 @@ class Cartogram:
                 self.loss += abs(grow_sqrt) * shape["area"] * multiplier
 
                 for point_index in shape_points:
-                    base_point = self.base[point_index]
-                    point = self.points[point_index]
-                    actual_x = point[0] - center_x
-                    actual_y = point[1] - center_y
-                    shape_x = (base_point[0] - shape["x"]) * target_sqrt - actual_x
-                    shape_y = (base_point[1] - shape["y"]) * target_sqrt - actual_y
-                    dx = actual_x * grow_sqrt * 0.20 + shape_x + bridge_x * 20 + home_x * 0.03
-                    dy = actual_y * grow_sqrt * 0.20 + shape_y + bridge_y * 20 + home_y * 0.03
-                    if deltas[point_index] is None:
-                        deltas[point_index] = [dx, dy]
+                    base_x, base_y = self.base[point_index]
+                    point_x, point_y = self.points[point_index]
+                    relative_x = point_x - center_x
+                    relative_y = point_y - center_y
+                    shape_pull_x = (base_x - shape["x"]) * target_sqrt - relative_x
+                    shape_pull_y = (base_y - shape["y"]) * target_sqrt - relative_y
+                    delta_x = (
+                        relative_x * grow_sqrt * 0.20
+                        + shape_pull_x
+                        + bridge_sum_x * 20
+                        + home_x * 0.03
+                    )
+                    delta_y = (
+                        relative_y * grow_sqrt * 0.20
+                        + shape_pull_y
+                        + bridge_sum_y * 20
+                        + home_y * 0.03
+                    )
+                    point_delta = deltas[point_index]
+                    if point_delta is None:
+                        deltas[point_index] = [delta_x, delta_y]
                     else:
-                        deltas[point_index][0] += dx
-                        deltas[point_index][1] += dy
+                        point_delta[0] += delta_x
+                        point_delta[1] += delta_y
 
         next_points = []
         for point, delta in zip(self.points, deltas):

@@ -12,7 +12,7 @@ coordinates and uses one small player to draw and animate both pages.
 
 ## Repository layout
 
-- `static/geometry.json` — canonical `world-006` geometry
+- `static/geometry.json` — canonical, content-versioned geometry
 - `static/cartogram-player.js` — shared browser renderer and player
 - `static/population_frames.json` — preserved Gapmover timeline
 - `static/measurement_paths.json` — generated World Sizer relaxation paths
@@ -46,19 +46,23 @@ The default produces five relaxation checkpoints for raw and
 density-corrected variants of each retained measurement. The resulting bundle
 is below the 1 MB compressed size budget.
 
-## Compare with a shipped population frame
+## Compare with the shipped population frames
 
 ```bash
-python generate.py compare-population --year 1800
+python generate.py compare-population
 ```
 
-This writes maximum, median, and RMS point displacement plus shipped,
-generated, and pixel-difference PNGs under `baseline/comparison/`. The PNGs
-are reproducible diagnostics and are ignored by Git; the compact report is
-retained.
+This applies the canonical country-code mappings and initializes each year from
+the preceding result, matching the timeline's generation model. It writes
+maximum, median, and RMS point displacement to `baseline/comparison/report.json`.
+Add `--render` for shipped, generated, and pixel-difference PNGs. The PNGs are
+ignored by Git.
 
-Use `--bridges canonical` to test the three bridges added in `world-006`, and
-`--mode continuation` to initialize each year from the preceding result.
+Use `--bridges canonical` to test the current bridge constraints instead of the
+ones used by the legacy population frames, or `--mode independent` to test each
+year from the base map.
+Use `--year 1800` for a quick single-frame check; a single later year also starts
+from the base map because its preceding frames were not generated.
 
 ## Audit data coverage
 

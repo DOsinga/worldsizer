@@ -4,7 +4,14 @@ import math
 import unittest
 from pathlib import Path
 
-from cartogram import Cartogram, normalized_weights
+from cartogram import (
+    Cartogram,
+    geometry_version,
+    normalized_weights,
+    population_weights,
+)
+from generate import parser
+from worldparser import build_geometry
 
 
 ROOT = Path(__file__).parent.parent
@@ -50,11 +57,13 @@ class CartogramTest(unittest.TestCase):
         paths = load("static/measurement_paths.json")
         point_count = len(self.geometry["points"])
 
-        self.assertEqual(self.geometry["version"], "world-006")
+        self.assertEqual(self.geometry["version"], geometry_version(self.geometry))
         self.assertEqual(len(self.geometry["countries"]), 175)
         self.assertEqual(point_count, 7491)
         self.assertEqual(population["geometry"], self.geometry["version"])
         self.assertEqual(paths["geometry"], self.geometry["version"])
+        self.assertEqual(population["solverBridges"], "legacy")
+        self.assertEqual(paths["solverBridges"], "canonical")
         self.assertTrue(all(len(frame) == point_count for frame in population["frames"].values()))
         self.assertTrue(
             all(
@@ -72,9 +81,50 @@ class CartogramTest(unittest.TestCase):
             )
         )
 
+        countries = {country["cc"]: country for country in self.geometry["countries"]}
+        iceland_bridges = countries["is"]["shapes"][0]["bridges"]
+        self.assertEqual({bridge[3] for bridge in iceland_bridges}, {"gb"})
+        lesotho_points = set(countries["ls"]["shapes"][0]["pts"])
+        south_africa_inner = next(
+            shape for shape in countries["za"]["shapes"]
+            if set(shape["pts"]) == lesotho_points
+        )
+        self.assertEqual({bridge[3] for bridge in south_africa_inner["bridges"]}, {"za"})
+
     def test_measurement_paths_fit_download_budget(self):
         raw = (ROOT / "static" / "measurement_paths.json").read_bytes()
         self.assertLessEqual(len(gzip.compress(raw)), 1_000_000)
+
+    def test_population_year_must_be_in_range(self):
+        population = load("data/population.json")
+        with self.assertRaises(ValueError):
+            population_weights(population, 1700)
+        with self.assertRaises(ValueError):
+            population_weights(population, 2101)
+
+    def test_population_comparison_uses_baseline_configuration(self):
+        arguments = parser().parse_args(["compare-population"])
+        self.assertEqual(arguments.mode, "continuation")
+        self.assertEqual(arguments.bridges, "legacy")
+
+    def test_geometry_source_reproduces_canonical_map(self):
+        generated = build_geometry(ROOT / "data" / "ne_110m_admin_0_countries")
+        self.assertEqual(
+            [country["cc"] for country in generated["countries"]],
+            [country["cc"] for country in self.geometry["countries"]],
+        )
+        self.assertLess(
+            max(math.dist(left, right) for left, right in zip(generated["points"], self.geometry["points"])),
+            1e-12,
+        )
+        for generated_country, canonical_country in zip(generated["countries"], self.geometry["countries"]):
+            self.assertAlmostEqual(generated_country["weight"], canonical_country["weight"], places=12)
+            for generated_shape, canonical_shape in zip(generated_country["shapes"], canonical_country["shapes"]):
+                self.assertEqual(generated_shape["pts"], canonical_shape["pts"])
+                self.assertEqual(
+                    [bridge[0] for bridge in generated_shape["bridges"]],
+                    [bridge[0] for bridge in canonical_shape["bridges"]],
+                )
 
 
 if __name__ == "__main__":

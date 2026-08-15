@@ -35,13 +35,14 @@ to the corresponding point in the canonical map.
 The geometry must have a version identifier. Generated datasets record that
 identifier so the player cannot combine frames with incompatible geometry.
 
-`static/geometry.json` is the canonical `world-006` geometry. Compared with the
+`static/geometry.json` is the canonical geometry. Its version is a content hash,
+so frames cannot claim compatibility after the map changes. Compared with the
 old `_001` geometry used by Gapmover, it has the same 175 countries, polygons,
-and 7,491 point coordinates in the same order. Its only changes are three added
-solver bridges on Brazil, Spain, and Iran. Bridges are not used when drawing,
-so the preserved Gapmover frames render identically against it. The three
-bridges do affect newly generated solver output, and the comparison command can
-disable them when investigating a difference.
+and 7,491 point coordinates in the same order. Bridges are not used when
+drawing, so the preserved Gapmover frames render identically against it. The
+current solver bridges add explicit constraints for Iceland and Lesotho
+alongside the earlier cross-water bridges. The comparison command can restore
+the legacy bridge configuration when investigating a difference.
 
 ## Baseline generator
 
@@ -54,12 +55,13 @@ target stepping, tick count, rounding, and possibly an older engine version
 also affect the result. Reproducing the current frames is therefore an
 acceptance test, not an assumption.
 
-For every frame, the baseline generator records:
+For every frame, the baseline comparison records:
 
 - maximum and median per-point displacement from the shipped coordinates, in
-  scaled-integer units; and
-- a rendered PNG at 720 x 540 plus a pixel-difference image against the shipped
-  frame.
+  scaled-integer units.
+
+An optional render pass writes PNGs at 720 x 540 plus pixel-difference images
+against the shipped frames.
 
 The coordinate measurements distinguish rounding noise from a different
 equilibrium. The render comparison shows whether a numerical difference is
@@ -252,6 +254,10 @@ relaxation paths are generated offline by the Python solver. Gapmover uses the
 preserved population frames because the missing historical harness prevents an
 exact regeneration. Baseline hashes, numerical comparisons, data coverage, and
 the one-megabyte compressed path budget are recorded in the repository.
+
+The force solver can still fold Canada's outline in extreme measurement paths.
+Preventing that without degrading the rest of the map requires a constrained
+optimizer rather than an extra bridge or a local post-processing step.
 
 The remaining work is source replacement: obtain maintained measurement and
 population datasets, define every historical mapping, regenerate the frames,

@@ -215,7 +215,7 @@ blog: 2016/1021
 
     async function loadYear(value, animate = false, updateHash = true) {
         const year = Math.min(2100, Math.max(1800, parseInt(value, 10)));
-        if (!populationFrames.frames[year]) return;
+        if (!populationFrames.frames[year]) return false;
 
         const slider = document.getElementById('year-slider');
         slider.value = year;
@@ -232,13 +232,14 @@ blog: 2016/1021
         );
         if (animate) await player.animateTo(points, 450);
         else player.setPoints(points);
+        return true;
     }
 
-    function setPlaying(playing) {
+    function setPlaying(isPlaying) {
         const button = document.getElementById('play-button');
-        button.dataset.playing = playing;
-        button.setAttribute('aria-label', playing ? 'Pause timeline' : 'Play timeline');
-        button.innerHTML = playing
+        button.dataset.playing = isPlaying;
+        button.setAttribute('aria-label', isPlaying ? 'Pause timeline' : 'Play timeline');
+        button.innerHTML = isPlaying
             ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>'
             : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
     }
@@ -260,15 +261,21 @@ blog: 2016/1021
                 stopAnimation();
                 return;
             }
-            await loadYear(nextYear, true);
+            if (!await loadYear(nextYear, true)) {
+                stopAnimation();
+                return;
+            }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', async function () {
+    async function initializeGapmover() {
         const [geometryResponse, framesResponse] = await Promise.all([
             fetch('{% static "projects/worldsizer/geometry.json" %}'),
             fetch('{% static "projects/worldsizer/population_frames.json" %}')
         ]);
+        if (!geometryResponse.ok || !framesResponse.ok) {
+            throw new Error('One or more cartogram files could not be loaded');
+        }
         const geometry = await geometryResponse.json();
         populationFrames = await framesResponse.json();
         if (geometry.version !== populationFrames.geometry) {
@@ -304,10 +311,19 @@ blog: 2016/1021
             }
         });
 
-        loadYear(initialYear);
+        await loadYear(initialYear);
         if (new URLSearchParams(window.location.search).has('animate')) {
             startAnimation();
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeGapmover().catch(error => {
+            console.error(error);
+            const status = document.getElementById('gapmover-status');
+            status.textContent = 'Unable to load the population timeline';
+            status.setAttribute('role', 'alert');
+        });
     });
 </script>
 
@@ -334,7 +350,7 @@ blog: 2016/1021
 </div>
 
 <div class="gapmover-meta">
-    <span>Area represents share of world population</span>
+    <span id="gapmover-status">Area represents share of world population</span>
     <span><a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a></span>
 </div>
 

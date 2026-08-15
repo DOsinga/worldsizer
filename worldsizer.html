@@ -1,215 +1,282 @@
 <script type="text/markdown" id="info">
 name: World Sizer
 description: >
-  What does the world look like if we size the countries according to the number of people living there? GDP? Size of the military? This project allows you to explore the world in a different way.
+  What does the world look like if we size countries by population, GDP, emissions, or another measurement?
 github: worldsizer
 pass_on_request: ['state']
+blog: 2016/1021
 </script>
 
 <style>
-table#lowest_highest {
-    font-size:16px;
-    border-collapse: collapse;
-    border-spacing: 0;
-    width: 100%;
-}
+    .worldsizer-stage {
+        max-width: 900px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #d6d6d6;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    }
 
-#lowest_highest td, #lowest_highest th {
-    border: 1px solid #ddd;
-    text-align: left;
-    padding: 8px;
-}
+    .worldsizer-canvas-wrap {
+        background: #7785c0;
+    }
 
-#lowest_highest tr:nth-child(even){background-color: #f2f2f2}
+    #worldmap {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
 
-#lowest_highest th {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    background-color: #e6e3d9;
-    color: white;
-}
+    .worldsizer-controls {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        gap: 18px;
+        align-items: end;
+        padding: 18px 20px;
+    }
+
+    .worldsizer-field label,
+    .worldsizer-density span {
+        display: block;
+        margin-bottom: 6px;
+        color: #777;
+        font-family: 'Geist Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    #measurement {
+        width: 100%;
+        padding: 10px 38px 10px 12px;
+        border: 1px solid #d6d6d6;
+        border-radius: 8px;
+        background: #fff;
+        color: #424242;
+        font: inherit;
+    }
+
+    .worldsizer-density label {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 12px;
+        border: 1px solid #d6d6d6;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .worldsizer-density input {
+        accent-color: #f73859;
+    }
+
+    .worldsizer-meta {
+        max-width: 900px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 14px 0 38px;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .worldsizer-meta a {
+        color: inherit;
+    }
+
+    .worldsizer-results {
+        max-width: 900px;
+    }
+
+    .worldsizer-results h2 {
+        margin: 0 0 18px;
+        font-size: 24px;
+    }
+
+    #lowest-highest {
+        width: 100%;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #d6d6d6;
+        border-radius: 8px;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    #lowest-highest th,
+    #lowest-highest td {
+        padding: 10px 14px;
+        border-bottom: 1px solid #e5e5e5;
+        text-align: left;
+    }
+
+    #lowest-highest th {
+        background: #f9f9f9;
+        font-family: 'Geist Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    #lowest-highest tr:last-child td {
+        border-bottom: 0;
+    }
+
+    #lowest-highest td:nth-child(2),
+    #lowest-highest td:nth-child(4) {
+        font-family: 'Geist Mono', monospace;
+        text-align: right;
+    }
+
+    @media (max-width: 640px) {
+        .worldsizer-stage {
+            border-radius: 8px;
+        }
+
+        .worldsizer-controls {
+            grid-template-columns: 1fr;
+            padding: 14px;
+        }
+
+        .worldsizer-meta {
+            margin-bottom: 30px;
+        }
+
+        #lowest-highest th,
+        #lowest-highest td {
+            padding: 8px;
+            font-size: 13px;
+        }
+    }
 </style>
 
-<script type="text/javascript" src="{{ static }}countries_006.js"></script>
-<script type="text/javascript" src="{{ static }}country_data.js"></script>
-<script type="text/javascript" src="{{ static }}worldsizer.js"></script>
+<script src="{% static "projects/worldsizer/cartogram-player.js" %}"></script>
 
+<div class="worldsizer-stage">
+    <div class="worldsizer-canvas-wrap">
+        <canvas id="worldmap" width="720" height="540" aria-label="Cartogram of the world"></canvas>
+    </div>
+    <div class="worldsizer-controls">
+        <div class="worldsizer-field">
+            <label for="measurement">Size countries by</label>
+            <select id="measurement">
+                <option value="Area">Area</option>
+                <option value="Population">Population</option>
+                <option value="Carbon Emissions">CO2 emissions</option>
+                <option value="Army Size">Active army size</option>
+                <option value="GDP (official exchange rate)">GDP (exchange rate)</option>
+                <option value="Living with Aids">Living with AIDS</option>
+                <option value="Exports">Exports</option>
+                <option value="Alcohol Consumption">Alcohol consumption</option>
+                <option value="Labor force">Labor force</option>
+                <option value="Olympic Medals">Olympic medals won</option>
+            </select>
+        </div>
+        <div class="worldsizer-density">
+            <span>Adjustment</span>
+            <label><input type="checkbox" id="correct-density" checked> Compensate for population density</label>
+        </div>
+    </div>
+</div>
 
-<script type="text/javascript">
-    var worldSizer;
-    var currentState;
+<div class="worldsizer-meta">
+    <span id="worldsizer-status">Geographic area</span>
+    <span><a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a></span>
+</div>
 
-    function countryWeights(src, property, correctForDensity) {
-        res = {};
-        sum = 0;
-        for (var key1 in src) {
-            if (src.hasOwnProperty(key1) && src[key1][property] !== undefined) {
-                res[key1] = src[key1][property];
-                if (correctForDensity && src[key1]["Population"]) {
-                    if (!src[key1]["Population"] ||  !src[key1]["Area"]) {
-                        console.log('~~', key1);
-                    }
-                    res[key1] /= (src[key1]["Population"] / src[key1]["Area"]);
+<div class="worldsizer-results">
+    <h2>Largest and smallest</h2>
+    <table id="lowest-highest">
+        <thead><tr><th colspan="2">Largest</th><th colspan="2">Smallest</th></tr></thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const staticRoot = '{% static "projects/worldsizer/" %}';
+        const [geometryResponse, pathsResponse, measurementsResponse] = await Promise.all([
+            fetch(staticRoot + 'geometry.json'),
+            fetch(staticRoot + 'measurement_paths.json'),
+            fetch(staticRoot + 'measurements.json')
+        ]);
+        const geometry = await geometryResponse.json();
+        const pathData = await pathsResponse.json();
+        const measurements = await measurementsResponse.json();
+        if (geometry.version !== pathData.geometry) {
+            throw new Error('Measurement frames use incompatible geometry');
+        }
+
+        const player = new CartogramPlayer(document.getElementById('worldmap'), geometry, {
+            fit: true,
+            margin: 75
+        });
+        const paths = CartogramPlayer.decodePaths(pathData, geometry.points);
+        const countryNames = new Map(geometry.countries.map(country => [country.cc, country.name]));
+        const select = document.getElementById('measurement');
+        const density = document.getElementById('correct-density');
+        const status = document.getElementById('worldsizer-status');
+        let currentKey = 'Area';
+        let changing = false;
+        player.draw();
+
+        function keyFor(field) {
+            return field === 'Area' ? field : field + (density.checked ? ':density' : '');
+        }
+
+        function updateTable(field) {
+            const rows = Object.entries(measurements)
+                .filter(([, values]) => typeof values[field] === 'number' && values[field] > 1)
+                .map(([countryCode, values]) => [countryNames.get(countryCode) || values.Iso2, values[field]])
+                .sort((left, right) => right[1] - left[1]);
+            const body = document.querySelector('#lowest-highest tbody');
+            body.replaceChildren();
+            for (let index = 0; index < Math.min(5, Math.floor(rows.length / 2)); index++) {
+                const row = document.createElement('tr');
+                const values = [rows[index][0], rows[index][1], rows[rows.length - 1 - index][0], rows[rows.length - 1 - index][1]];
+                for (const value of values) {
+                    const cell = document.createElement('td');
+                    cell.textContent = typeof value === 'number' ? Math.round(value).toLocaleString() : value;
+                    row.appendChild(cell);
                 }
-                sum += res[key1];
-            }
-        }
-        for (var key2 in res) {
-            if (res.hasOwnProperty(key2)) {
-                res[key2] /= sum;
-            }
-        }
-        return res;
-    }
-
-    function unwindToArea(callback) {
-        var canvas = document.getElementById('worldmap');
-        function animate() {
-            worldSizer.draw(canvas, 75);
-            if (worldSizer.iterations.length > 1) {
-                worldSizer.unWind();
-                setTimeout(animate, 10);
-            } else {
-                callback();
-            }
-        }
-        animate();
-    }
-
-    function animateTo(newState, callback, correctForDensity) {
-        targetWeights = countryWeights(COUNTRY_DATA, newState, correctForDensity);
-        worldSizer.setTargetWeights(targetWeights);
-        var canvas = document.getElementById('worldmap');
-        function animate() {
-            worldSizer.draw(canvas, 75);
-            if (worldSizer.iterations.length < 300) {
-                worldSizer.tick();
-                setTimeout(animate, 10);
-            } else {
-                callback();
-            }
-        }
-        animate();
-    }
-
-    function changeStateTo(newState, correctForDensity, callback) {
-        nestedCallback = function() {
-            currentState = newState;
-            if (callback) {
-                callback();
-            }
-        };
-        if (newState == currentState) {
-            nestedCallback();
-            return;
-        }
-        if (newState == 'Area') {
-            unwindToArea(nestedCallback);
-        } else {
-            if (currentState != 'Area') {
-                unwindToArea(function() {
-                    animateTo(newState, nestedCallback, correctForDensity);
-                })
-            } else {
-                animateTo(newState, nestedCallback, correctForDensity);
-            }
-        }
-    }
-
-    function loadTable(properties, property) {
-        var data = [];
-        for (var i = 0; i < COUNTRIES.length; i ++) {
-            var country = COUNTRIES[i];
-            var props = properties[country.cc];
-            if (props && props[property] > 1) {
-                data.push([country.name, props[property]]);
+                body.appendChild(row);
             }
         }
 
-        data = data.sort(function (c1, c2) {
-            return c2[1] - c1[1];
-        });
+        async function changeMeasurement() {
+            if (changing) return;
+            const field = select.value;
+            const targetKey = keyFor(field);
+            if (targetKey === currentKey) return;
+            changing = true;
+            select.disabled = true;
+            density.disabled = true;
+            status.textContent = 'Calculating transition…';
 
-        $.each($('#lowest_highest td'), function(idx, cell) {
-            var row = Math.floor(idx / 4);
-            var col = idx % 4;
-            if (col >= 2) {
-                row = data.length - 1 - row;
+            const sequence = [];
+            if (currentKey !== 'Area') {
+                sequence.push(...paths[currentKey].slice(0, -1).reverse(), geometry.points);
             }
-            col %= 2;
-            var val = data[row][col];
-            if (col === 1) {
-                val = Math.round(val);
-            }
-            $(cell).text(val);
-        });
-        return data;
-    }
-
-    $(function () {
-        var canvas = document.getElementById('worldmap');
-        // var north_america = COUNTRIES.filter(c => c.continent == 'Americas');
-        worldSizer = new WorldSizer(POINT_INDEX, COUNTRIES);
-        loadTable(COUNTRY_DATA, 'Area');
-        worldSizer.draw(canvas, 75);
-        currentState = $("#measurement").val();
-
-        function onMeasurementChanged() {
-            var newState = $("#measurement").val();
-            loadTable(COUNTRY_DATA, newState);
-            history.pushState({'newState': newState}, newState, '?state=' + encodeURIComponent(newState));
-            $('#measurement').prop('disabled', 'disabled');
-            changeStateTo(newState, $('#correctForDensity').is(':checked'), function() {
-                $('#measurement').prop('disabled', false);
-            });
+            if (targetKey !== 'Area') sequence.push(...paths[targetKey]);
+            await player.animateSequence(sequence, 110);
+            currentKey = targetKey;
+            status.textContent = field === 'Area' ? 'Geographic area' : 'Area represents ' + select.options[select.selectedIndex].text.toLowerCase();
+            updateTable(field);
+            history.replaceState({state: field}, '', '?state=' + encodeURIComponent(field));
+            select.disabled = false;
+            density.disabled = false;
+            changing = false;
         }
 
-        $("#measurement").on('change', onMeasurementChanged);
-        $("#correctForDensity").on('change', onMeasurementChanged);
+        select.addEventListener('change', changeMeasurement);
+        density.addEventListener('change', changeMeasurement);
+        updateTable('Area');
 
-        {% if state %}
-        $('#measurement').val('{{ state|safe }}').change();
-        {% endif %}
+        const initialState = '{{ state|default:"Area"|escapejs }}';
+        if (Array.from(select.options).some(option => option.value === initialState)) {
+            select.value = initialState;
+            if (initialState !== 'Area') await changeMeasurement();
+        }
     });
 </script>
-
-<P>
-    To learn more, check out the corresponding <a href="http://blog.douweosinga.com/2016/10/worldsizer.html">blog post</a>.
-</P>
-<P>
-    <label for="measurement">Pick a measurement to resize the map accordingly:</label>
-    <select id="measurement">
-        <option value="Area">Area</option>
-        <option value="Population">Population</option>
-        <option value="Carbon Emissions">CO2 emissions</option>
-        <option value="Army Size">Active Army Size</option>
-        <option value="GDP (official exchange rate)">GDP (Exchange Rate)</option>
-        <option value="Living with Aids">Li                  ving with AIDS</option>
-        <option value="Exports">Exports</option>
-        <option value="Alcohol Consumption">Alcohol Consumption</option>
-        <option value="Land use">Productive Land Area</option>
-        <option value="Labor force">Labor force</option>
-        <option value="Olympic Medals">Olympic Medals Won</option>
-    </select>
-    <br/>
-    <label for="correctForDensity">Check here to compensate for population density.</label>
-    <input type="checkbox" id="correctForDensity" checked>
-    <br/>
-    When sizing countries according to measurements that correlate with population, denser
-    populated places show up bigger even though that might just because there are more people.
-    Use this checkbox to correct for that.
-</P>
-
-<p style="text-align: center">
-    <canvas id="worldmap" width="720" height="540" style="background-color: #7785C0" class="media-container"></canvas>
-    <br/><em>Projection: <a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide</a></em>
-</p>
-
-<table id="lowest_highest">
-    <tr><th colspan="2">Top 5</th><th colspan="2">Bottom 5</th></tr>
-    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
-    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
-    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
-    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
-    <tr><td>India</td><td>Quite a lot</td><td>Vatican City<td>Not so many</td></tr>
-</table>

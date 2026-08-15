@@ -1,0 +1,30 @@
+{
+  "geometry": {
+    "path": "static/geometry.json",
+    "sha256": "400a9f6505fef8e04ec65695b047f9122b050d3de9308981b403c81181d461d5",
+    "legacySha256": "8f0d7e496f7a9c4528b097fd84c8fd79ec225e921bcd1cddd835283683b9ffb8"
+  },
+  "measurements": {
+    "path": "data/measurements.json",
+    "sha256": "2eec9daf971658dd8deb0169a8b4f366ad28b68887e87446b5babb98e2eea156",
+    "legacySha256": "42d68dc79cf2b0215d6b6b36267636ecc9ba627da828d5e2860dd2f6e8294054"
+  },
+  "population": {
+    "path": "data/population.json",
+    "sha256": "de1c648a66d2eb8f6c87bf879ed0f747e804f357ee95f571fac878581be427ff",
+    "legacySha256": "086ecf2041758d10ee26b50007ad2d10bc8c93728a10db232e8145b8174f8dc6"
+  },
+  "populationFrames": {
+    "path": "static/population_frames.json",
+    "sha256": "a393d0d5b3d890b436d06a0791ff9b61260cd363467fe873e8c5785222fb40cf",
+    "legacySha256": "466c0f039b202e5dfb82f4a331e9d1b36e2f53a8ce0c26d5ff4c41f615883bdc"
+  },
+  "measurementPaths": {
+    "path": "static/measurement_paths.json",
+    "sha256": "06b114f8cdd4f8ae72447137bc77d5176d2ea6310fb2792c137b314ca071cf4c"
+  },
+  "player": {
+    "path": "static/cartogram-player.js",
+    "sha256": "a62f2142ae387f226feac27b53d3f42f6705ed4e9da938df542312ecfa91e0b5"
+  }
+}

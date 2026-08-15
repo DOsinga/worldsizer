@@ -1,0 +1,21 @@
+{
+  "measurements": [
+    {"id": "Area", "label": "Area"},
+    {"id": "Population", "label": "Population"},
+    {"id": "Carbon Emissions", "label": "CO2 emissions"},
+    {"id": "Army Size", "label": "Active army size"},
+    {"id": "GDP (official exchange rate)", "label": "GDP (exchange rate)"},
+    {"id": "Living with Aids", "label": "Living with AIDS"},
+    {"id": "Exports", "label": "Exports"},
+    {"id": "Alcohol Consumption", "label": "Alcohol consumption"},
+    {"id": "Labor force", "label": "Labor force"},
+    {"id": "Olympic Medals", "label": "Olympic medals won"}
+  ],
+  "removed": [
+    {
+      "id": "Land use",
+      "label": "Productive land area",
+      "reason": "The served dataset contains no values for this field."
+    }
+  ]
+}

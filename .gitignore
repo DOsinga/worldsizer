@@ -82,6 +82,9 @@ celerybeat-schedule
 venv/
 ENV/
 
+# Reproducible visual comparison output
+/baseline/comparison/*.png
+
 # Spyder project settings
 .spyderproject
 

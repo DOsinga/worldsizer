@@ -2,7 +2,6 @@
 import math
 import pyproj
 import shapefile
-import pprint
 import json
 from collections import defaultdict, Counter
 
@@ -35,18 +34,23 @@ def calc_area(pts):
     return abs(area) / 2.0
 
 
-MAGIC_MOLL_NUMBER = 9020047.848073646
-SRC_PROJ = pyproj.Proj(proj='longlat', ellps='WGS84', datum='WGS84')
-DST_PROJ = pyproj.Proj(
-    proj='moll', lon_0=0, x_0=0, y_0=0, ellps='WGS84', datum='WGS84', units='m'
+MOLLWEIDE_HALF_WIDTH = math.sqrt(2) * 6378137
+TRANSFORMER = pyproj.Transformer.from_crs(
+    "EPSG:4326",
+    "+proj=moll +lon_0=0 +datum=WGS84 +units=m +no_defs",
+    always_xy=True,
 )
 
 
 def project_point(pt):
-    x, y = pyproj.transform(SRC_PROJ, DST_PROJ, pt[0], pt[1])
-    return (x / 2 + MAGIC_MOLL_NUMBER) / (MAGIC_MOLL_NUMBER * 2), (
-        MAGIC_MOLL_NUMBER - y
-    ) / (MAGIC_MOLL_NUMBER * 2)
+    if pt[1] >= 90:
+        return 0.5, 0
+    if pt[1] <= -90:
+        return 0.5, 1
+    x, y = TRANSFORMER.transform(pt[0], pt[1])
+    return (x / 2 + MOLLWEIDE_HALF_WIDTH) / (MOLLWEIDE_HALF_WIDTH * 2), (
+        MOLLWEIDE_HALF_WIDTH - y
+    ) / (MOLLWEIDE_HALF_WIDTH * 2)
 
 
 def extract_shapes(shape):
@@ -93,12 +97,14 @@ def index_shape(sh, all_points, all_points_index):
 def distance_squared(pt1, pt2):
     dx = pt1[0] - pt2[0]
     dy = pt1[1] - pt2[1]
+    # Normalized Mollweide coordinates are twice as wide as they are tall.
     return dx * dx * 4 + dy * dy
 
 
-def remove_guyana(shapes, cc):
+def remove_french_guiana(shapes, cc):
     if cc != 'fr':
         return shapes
+    # French Guiana lies west of 0.4; mainland France and Corsica lie east of it.
     return [shape for shape in shapes if shape['x'] > 0.4]
 
 
@@ -139,8 +145,8 @@ def main():
         rec['cc'] = cc
 
     point_to_shape = {}
-    for idx, shapes in enumerate(indexed_shapes):
-        cc = recs[idx]['cc']
+    for record_index, shapes in enumerate(indexed_shapes):
+        cc = recs[record_index]['cc']
         for shape in shapes:
             for pt in shape['pts']:
                 point_to_shape[pt] = (cc, shape)
@@ -150,13 +156,13 @@ def main():
     # projection. We should probably *also* save the lat/lng for each shape
     # and then use the spherical distance here. Oh well.
     geo_index = defaultdict(list)
-    for idx, pt in enumerate(all_points):
+    for point_index, pt in enumerate(all_points):
         geo_index[int(500 * pt[1]) * 500 + int(500 * pt[0])].append(
-            (idx, pt, point_to_shape[idx])
+            (point_index, pt, point_to_shape[point_index])
         )
 
-    for idx, shapes in enumerate(indexed_shapes):
-        cc = recs[idx]['cc']
+    for record_index, shapes in enumerate(indexed_shapes):
+        cc = recs[record_index]['cc']
         for shape in shapes:
             # Find bridges for islands or ireland
             if shape['island'] or cc == 'ie':
@@ -182,7 +188,7 @@ def main():
 
                 shape_center = (shape['x'], shape['y'])
                 bridges = []
-                for idx, pt, (pt_cc, other_shape) in sorted(
+                for point_index, pt, (pt_cc, other_shape) in sorted(
                     near,
                     key=lambda other: distance_squared(other[1], shape_center),
                 ):
@@ -200,17 +206,17 @@ def main():
                         ):
                             break
                     else:
-                        bridges.append((idx, pt, pt_cc))
+                        bridges.append((point_index, pt, pt_cc))
                 shape['bridges'] = [
-                    (idx, pt[0] - shape['x'], pt[1] - shape['y'], pt_cc)
-                    for idx, pt, pt_cc in bridges
+                    (point_index, pt[0] - shape['x'], pt[1] - shape['y'], pt_cc)
+                    for point_index, pt, pt_cc in bridges
                 ]
 
     countries = [
         {
             'name': str(rec['name']),
             'cc': rec['cc'],
-            'shapes': remove_guyana(shapes, rec['cc']),
+            'shapes': remove_french_guiana(shapes, rec['cc']),
             'region': str(rec['region_un']),
             'continent': str(rec['continent']),
             'weight': size / total_size,
@@ -223,14 +229,8 @@ def main():
     for cc1, cc2 in EXTRA_BRIDGES:
         country1 = countries_by_cc[cc1]
         shape1 = max(country1['shapes'], key=lambda shape: shape['area'])
-        # If the country codes are the same, connect the two largest masses (Alaska)
-        if cc2 == cc1:
-            country2 = countries_by_cc['us']
-            shape2 = sorted(country2['shapes'], key=lambda shape: shape['area'])[-2]
-
-        else:
-            country2 = countries_by_cc[cc2]
-            shape2 = max(country2['shapes'], key=lambda shape: shape['area'])
+        country2 = countries_by_cc[cc2]
+        shape2 = max(country2['shapes'], key=lambda shape: shape['area'])
         if shape1['area'] < shape2['area']:
             shape1, shape2 = shape2, shape1
             country1, country2 = country2, country1
@@ -245,23 +245,11 @@ def main():
             (pt_idx, x - shape1['x'], y - shape1['y'], country1['cc'])
         )
 
-    with open('data/countries.py', 'w') as fout:
-        fout.write(
-            'COUNTRIES='
-            + pprint.pformat(countries)
-            + '\n'
-            + 'POINT_INDEX='
-            + pprint.pformat(all_points)
-            + '\n'
-        )
-    with open('data/countries.js', 'w') as fout:
-        fout.write(
-            'COUNTRIES='
-            + json.dumps(countries, indent=2)
-            + ';\n'
-            + 'POINT_INDEX='
-            + json.dumps(all_points, indent=2)
-            + ';\n'
+    with open('static/geometry.json', 'w') as fout:
+        json.dump(
+            {"version": "world-006", "countries": countries, "points": all_points},
+            fout,
+            separators=(",", ":"),
         )
 
 

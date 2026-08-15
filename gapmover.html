@@ -1,0 +1,356 @@
+<script type="text/markdown" id="info">
+name: World Pop
+description: >
+  Inspired by Gapminder, this shows the population of the countries of the world by morphing their shapes from 1800 to 2100.
+type: ai
+github: worldsizer
+blog: 2016/1021
+</script>
+
+<style>
+    .gapmover-stage {
+        max-width: 900px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #d6d6d6;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    }
+
+    .gapmover-canvas-wrap {
+        background: #7785c0;
+    }
+
+    #worldmap {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .gapmover-controls {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
+        padding: 18px 20px 16px;
+    }
+
+    #play-button {
+        width: 42px;
+        height: 42px;
+        display: inline-grid;
+        place-items: center;
+        padding: 0;
+        border: 1px solid #d6d6d6;
+        border-radius: 50%;
+        background: #fff;
+        color: #424242;
+        cursor: pointer;
+        transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+    }
+
+    #play-button:hover {
+        border-color: #f73859;
+        color: #f73859;
+    }
+
+    #play-button:focus-visible,
+    #year-slider:focus-visible {
+        outline: 3px solid rgba(247, 56, 89, 0.25);
+        outline-offset: 3px;
+    }
+
+    #play-button svg {
+        width: 17px;
+        height: 17px;
+        fill: currentColor;
+    }
+
+    .timeline {
+        min-width: 0;
+    }
+
+    #year-slider {
+        --progress: 0%;
+        width: 100%;
+        height: 4px;
+        display: block;
+        margin: 0;
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(to right, #f73859 var(--progress), #dedede var(--progress));
+        cursor: pointer;
+    }
+
+    #year-slider::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+        appearance: none;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: #f73859;
+        box-shadow: 0 0 0 1px #f73859, 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #year-slider::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: #f73859;
+        box-shadow: 0 0 0 1px #f73859, 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 9px;
+        color: #777;
+        font-family: 'Geist Mono', monospace;
+        font-size: 12px;
+    }
+
+    #selected-year {
+        min-width: 4ch;
+        color: #424242;
+        font-family: 'Geist Mono', monospace;
+        font-size: 18px;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .gapmover-meta {
+        max-width: 900px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 14px 0 38px;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .gapmover-meta a {
+        color: inherit;
+    }
+
+    .observations {
+        max-width: 900px;
+    }
+
+    .observations h2 {
+        margin: 0 0 18px;
+        font-size: 24px;
+    }
+
+    .observation-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .observation-grid li {
+        padding: 18px 20px;
+        background: #f9f9f9;
+        border: 1px solid #dedede;
+        border-radius: 8px;
+        line-height: 1.45;
+    }
+
+    .observation-grid a {
+        color: #f73859;
+        font-family: 'Geist Mono', monospace;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .observation-grid a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+        .gapmover-stage {
+            border-radius: 8px;
+        }
+
+        .gapmover-controls {
+            grid-template-columns: auto 1fr;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        #selected-year {
+            grid-column: 2;
+            grid-row: 1;
+            justify-self: end;
+            margin-bottom: 14px;
+        }
+
+        .timeline {
+            grid-column: 1 / -1;
+        }
+
+        .gapmover-meta {
+            margin-bottom: 30px;
+        }
+
+        .observation-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="{% static "projects/worldsizer/cartogram-player.js" %}"></script>
+<script>
+    let player;
+    let populationFrames;
+    let playing = false;
+
+    function sliderProgress(year) {
+        return ((year - 1800) / 300) * 100 + '%';
+    }
+
+    async function loadYear(value, animate = false, updateHash = true) {
+        const year = Math.min(2100, Math.max(1800, parseInt(value, 10)));
+        if (!populationFrames.frames[year]) return;
+
+        const slider = document.getElementById('year-slider');
+        slider.value = year;
+        slider.style.setProperty('--progress', sliderProgress(year));
+        document.getElementById('selected-year').textContent = year;
+
+        if (updateHash && window.location.hash !== '#' + year) {
+            history.replaceState(null, '', '#' + year);
+        }
+
+        const points = CartogramPlayer.scaledPoints(
+            populationFrames.frames[year],
+            populationFrames.scale
+        );
+        if (animate) await player.animateTo(points, 450);
+        else player.setPoints(points);
+    }
+
+    function setPlaying(playing) {
+        const button = document.getElementById('play-button');
+        button.dataset.playing = playing;
+        button.setAttribute('aria-label', playing ? 'Pause timeline' : 'Play timeline');
+        button.innerHTML = playing
+            ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>'
+            : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+    }
+
+    function stopAnimation() {
+        playing = false;
+        if (player) player.cancel();
+        setPlaying(false);
+    }
+
+    async function startAnimation() {
+        const slider = document.getElementById('year-slider');
+        if (parseInt(slider.value, 10) >= 2100) await loadYear(1800);
+        playing = true;
+        setPlaying(true);
+        while (playing) {
+            const nextYear = parseInt(slider.value, 10) + 20;
+            if (nextYear > 2100) {
+                stopAnimation();
+                return;
+            }
+            await loadYear(nextYear, true);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        const [geometryResponse, framesResponse] = await Promise.all([
+            fetch('{% static "projects/worldsizer/geometry.json" %}'),
+            fetch('{% static "projects/worldsizer/population_frames.json" %}')
+        ]);
+        const geometry = await geometryResponse.json();
+        populationFrames = await framesResponse.json();
+        if (geometry.version !== populationFrames.geometry) {
+            throw new Error('Population frames use incompatible geometry');
+        }
+        player = new CartogramPlayer(document.getElementById('worldmap'), geometry, {
+            xMargin: -140,
+            yMargin: 35,
+            zoom: 1.2,
+            exclude: ['gl']
+        });
+
+        const slider = document.getElementById('year-slider');
+        const playButton = document.getElementById('play-button');
+        const hashYear = parseInt(window.location.hash.slice(1), 10);
+        const initialYear = populationFrames.frames[hashYear] ? hashYear : 1800;
+
+        slider.addEventListener('input', function () {
+            stopAnimation();
+            loadYear(slider.value);
+        });
+
+        playButton.addEventListener('click', function () {
+            if (playing) stopAnimation();
+            else startAnimation();
+        });
+
+        window.addEventListener('hashchange', function () {
+            const year = parseInt(window.location.hash.slice(1), 10);
+            if (populationFrames.frames[year]) {
+                stopAnimation();
+                loadYear(year, false);
+            }
+        });
+
+        loadYear(initialYear);
+        if (new URLSearchParams(window.location.search).has('animate')) {
+            startAnimation();
+        }
+    });
+</script>
+
+<div class="gapmover-stage">
+    <div class="gapmover-canvas-wrap">
+        <canvas id="worldmap" width="720" height="540" aria-label="Population cartogram of the world"></canvas>
+    </div>
+    <div class="gapmover-controls">
+        <button id="play-button" type="button" aria-label="Play timeline" data-playing="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="timeline">
+            <label for="year-slider" style="position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);">Year</label>
+            <input id="year-slider" type="range" min="1800" max="2100" step="20" value="1800">
+            <div class="timeline-labels" aria-hidden="true">
+                <span>1800</span>
+                <span>1900</span>
+                <span>2000</span>
+                <span>2100</span>
+            </div>
+        </div>
+        <output id="selected-year" for="year-slider">1800</output>
+    </div>
+</div>
+
+<div class="gapmover-meta">
+    <span>Area represents share of world population</span>
+    <span><a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a></span>
+</div>
+
+<div class="observations">
+    <h2>Things to notice</h2>
+    <ul class="observation-grid">
+        <li>Ireland <a href="#1840">1840</a> is a populous country in Europe, with 8 million people,
+            3 million more than today</li>
+        <li>India's population keeps growing but was the smallest in <a href="#1980">1980</a> relative to the
+            global population.</li>
+        <li>Japan remains relatively stable until <a href="#2000">2000</a>, when it starts to shrink fast.</li>
+        <li>Australia is almost invisible in <a href="#1800">1800</a> and remains quite small,
+            even in <a href="#2100">2100</a>.</li>
+        <li>Africa is where the growth is in 21st century, with Nigeria projected to overtake the US
+            by <a href="#2060">2060</a>.</li>
+        <li>China is the most populous country until around <a href="#2020">2020</a> when India overtakes it.
+        Yet, its relative size shrinks during this entire timespan.</li>
+    </ul>
+</div>

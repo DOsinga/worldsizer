@@ -1,13 +1,25 @@
 {
   "geometry": {
     "path": "static/geometry.json",
-    "sha256": "7bf51f03ba347df210b737dce77d3c21d785e2c8044c72c28f59df8149195b2e",
+    "sha256": "e5ee036101a35956d55719e445fe978034b5582875f13c7c186ca99a4be72acd",
     "legacySha256": "8f0d7e496f7a9c4528b097fd84c8fd79ec225e921bcd1cddd835283683b9ffb8"
   },
   "measurements": {
     "path": "data/measurements.json",
-    "sha256": "2eec9daf971658dd8deb0169a8b4f366ad28b68887e87446b5babb98e2eea156",
+    "sha256": "dca702ce2e305cd148fb93298c525ea7f1b62b463843288a152b0723325624d0",
     "legacySha256": "42d68dc79cf2b0215d6b6b36267636ecc9ba627da828d5e2860dd2f6e8294054"
+  },
+  "worldBankSource": {
+    "path": "data/sources/world_bank.json",
+    "sha256": "6784e3a2e17c5bf455e4556dde1c10d725adaf97faad5c9dfa80fd1ae4672297"
+  },
+  "eiaSource": {
+    "path": "data/sources/eia.json",
+    "sha256": "3f4e022e88f8d05a6d611484f1bb74f5973c3ed1cef861a48fa45a7915ad799f"
+  },
+  "olympicMedals": {
+    "path": "data/sources/olympic_medals.json",
+    "sha256": "e9c73848b379705c9e05af219ad05fa903c35e794c55b32e0894a4de8f485636"
   },
   "population": {
     "path": "data/population.json",
@@ -16,15 +28,23 @@
   },
   "populationFrames": {
     "path": "static/population_frames.json",
-    "sha256": "3fc0360eae262fd91fe59852d25683b80c70ef357f5ed7fd163a403d0fa3817f",
-    "legacySha256": "466c0f039b202e5dfb82f4a331e9d1b36e2f53a8ce0c26d5ff4c41f615883bdc"
+    "sha256": "f92d74a72217a0438073c35bcc50851a606b8ab1d3c9ee2ab9894b3fa80905db"
+  },
+  "legacyPopulationFrames": {
+    "path": "baseline/population_frames.json.gz",
+    "sha256": "e7e9930a820a89b521292ae64df5551b860ba3e8a4041e8a7759ce9736d20fee",
+    "contentSha256": "3fc0360eae262fd91fe59852d25683b80c70ef357f5ed7fd163a403d0fa3817f"
   },
   "measurementPaths": {
     "path": "static/measurement_paths.json",
-    "sha256": "a1737ecd852ff3d91d46e782aa75ab49e9a0e7fbcbee9f1d0ccc2084f09a1e4c"
+    "sha256": "5380ee4737c1c25ec6b9281938956abcf30d5786b9ee73669e4109c295b120ed"
+  },
+  "servedMeasurements": {
+    "path": "static/measurements.json",
+    "sha256": "4e91733f8aa969d31190a8506813a4e5be04546b874f5c7270e7c73ea1afe9b4"
   },
   "player": {
     "path": "static/cartogram-player.js",
-    "sha256": "ac1905896232d938706460b1cafff47ec77283f2ff527e1b47dce245d2264809"
+    "sha256": "c08359d8a47d2d18f818fcf9b5444819d150b1cb3b2f2c1a84474b2e5db06a3b"
   }
 }

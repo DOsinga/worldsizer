@@ -28,15 +28,10 @@ blog: 2016/1021
     }
 
     .worldsizer-controls {
-        display: grid;
-        grid-template-columns: minmax(220px, 1fr) auto;
-        gap: 18px;
-        align-items: end;
         padding: 18px 20px;
     }
 
-    .worldsizer-field label,
-    .worldsizer-density span {
+    .worldsizer-field label {
         display: block;
         margin-bottom: 6px;
         color: #777;
@@ -54,21 +49,6 @@ blog: 2016/1021
         background: #fff;
         color: #424242;
         font: inherit;
-    }
-
-    .worldsizer-density label {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 8px 12px;
-        border: 1px solid #d6d6d6;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-
-    .worldsizer-density input {
-        accent-color: #f73859;
     }
 
     .worldsizer-meta {
@@ -135,7 +115,6 @@ blog: 2016/1021
         }
 
         .worldsizer-controls {
-            grid-template-columns: 1fr;
             padding: 14px;
         }
 
@@ -163,25 +142,28 @@ blog: 2016/1021
             <select id="measurement">
                 <option value="Area">Area</option>
                 <option value="Population">Population</option>
-                <option value="Carbon Emissions">CO2 emissions</option>
-                <option value="Army Size">Active army size</option>
-                <option value="GDP (official exchange rate)">GDP (exchange rate)</option>
-                <option value="Living with Aids">Living with AIDS</option>
+                <option value="CO2 emissions">CO2 emissions</option>
+                <option value="Armed forces">Armed forces personnel</option>
+                <option value="GDP">GDP</option>
+                <option value="People living with HIV">People living with HIV</option>
                 <option value="Exports">Exports</option>
-                <option value="Alcohol Consumption">Alcohol consumption</option>
+                <option value="Alcohol consumption">Alcohol consumption</option>
                 <option value="Labor force">Labor force</option>
-                <option value="Olympic Medals">Olympic medals won</option>
+                <option value="Olympic medals">Olympic medals won</option>
+                <option value="Oil production">Oil production</option>
+                <option value="Forest area">Forest area</option>
             </select>
-        </div>
-        <div class="worldsizer-density">
-            <span>Adjustment</span>
-            <label><input type="checkbox" id="correct-density" checked> Compensate for population density</label>
         </div>
     </div>
 </div>
 
 <div class="worldsizer-meta">
-    <span id="worldsizer-status">Geographic area</span>
+    <span>
+        <span id="worldsizer-status">Geographic area</span>
+        <span aria-hidden="true"> · </span>
+        <a id="measurement-source" href="https://data.worldbank.org/indicator/AG.SRF.TOTL.K2">World Bank</a>
+        <span id="measurement-year">2023</span>
+    </span>
     <span><a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a></span>
 </div>
 
@@ -216,17 +198,13 @@ blog: 2016/1021
             margin: 75
         });
         const paths = new Map();
+        const measurementMetadata = new Map(pathData.measurements.map(item => [item.id, item]));
         const countryNames = new Map(geometry.countries.map(country => [country.cc, country.name]));
         const select = document.getElementById('measurement');
-        const density = document.getElementById('correct-density');
         const status = document.getElementById('worldsizer-status');
         let currentKey = 'Area';
         let changing = false;
         player.draw();
-
-        function keyFor(field) {
-            return field === 'Area' ? field : field + (density.checked ? ':density' : '');
-        }
 
         function pathFor(key) {
             if (!paths.has(key)) {
@@ -256,14 +234,22 @@ blog: 2016/1021
             }
         }
 
+        function updateMetadata(field) {
+            const metadata = measurementMetadata.get(field);
+            const source = document.getElementById('measurement-source');
+            source.textContent = metadata.source;
+            if (metadata.sourceUrl) source.href = metadata.sourceUrl;
+            else source.removeAttribute('href');
+            document.getElementById('measurement-year').textContent = metadata.year;
+        }
+
         async function changeMeasurement() {
             if (changing) return;
             const field = select.value;
-            const targetKey = keyFor(field);
+            const targetKey = field;
             if (targetKey === currentKey) return;
             changing = true;
             select.disabled = true;
-            density.disabled = true;
             status.textContent = 'Calculating transition…';
 
             const sequence = [];
@@ -275,14 +261,13 @@ blog: 2016/1021
             currentKey = targetKey;
             status.textContent = field === 'Area' ? 'Geographic area' : 'Area represents ' + select.options[select.selectedIndex].text.toLowerCase();
             updateTable(field);
+            updateMetadata(field);
             history.replaceState({state: field}, '', '?state=' + encodeURIComponent(field));
             select.disabled = false;
-            density.disabled = false;
             changing = false;
         }
 
         select.addEventListener('change', changeMeasurement);
-        density.addEventListener('change', changeMeasurement);
         updateTable('Area');
 
         const initialState = '{{ state|default:"Area"|escapejs }}';

@@ -1,16 +1,20 @@
 import argparse
 import copy
+import gzip
 import json
 from pathlib import Path
 from statistics import median
 
 from cartogram import (
     COLORS,
+    EXPANDED_COUNTRY_LAYOUTS,
     Cartogram,
     delta_frames,
     displacement,
     normalized_weights,
+    population_backfilled_weights,
     population_weights,
+    quantize,
 )
 
 
@@ -18,7 +22,8 @@ ROOT = Path(__file__).parent
 
 
 def load_json(path):
-    with open(path) as source:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt") as source:
         return json.load(source)
 
 
@@ -39,7 +44,12 @@ def canonical_codes(data, mappings):
 def legacy_geometry(geometry):
     geometry = copy.deepcopy(geometry)
     countries = {country["cc"]: country for country in geometry["countries"]}
-    for country_code, anchor_code in (("br", "sn"), ("es", "it"), ("ir", "qa")):
+    for country_code, anchor_code in (
+        ("br", "sn"),
+        ("cn", "ph"),
+        ("es", "it"),
+        ("ir", "qa"),
+    ):
         shape = max(countries[country_code]["shapes"], key=lambda item: item["area"])
         shape["bridges"] = [
             bridge for bridge in shape["bridges"]
@@ -73,6 +83,64 @@ def legacy_geometry(geometry):
         if set(shape["pts"]) == lesotho_points
     )
     south_africa_inner["bridges"] = []
+
+    sumatra = max(
+        (shape for shape in countries["id"]["shapes"] if shape["island"]),
+        key=lambda shape: shape["area"],
+    )
+    malaysia_points = [
+        point_index
+        for shape in countries["my"]["shapes"]
+        for point_index in shape["pts"]
+    ]
+    anchor_index = min(
+        malaysia_points,
+        key=lambda index: (
+            4 * (geometry["points"][index][0] - sumatra["x"]) ** 2
+            + (geometry["points"][index][1] - sumatra["y"]) ** 2
+        ),
+    )
+    anchor_x, anchor_y = geometry["points"][anchor_index]
+    sumatra["bridges"] = [[
+        anchor_index,
+        anchor_x - sumatra["x"],
+        anchor_y - sumatra["y"],
+        "my",
+    ]]
+
+    philippines = countries["ph"]["shapes"]
+    for shape in (philippines[0], philippines[2]):
+        anchor_index = min(
+            malaysia_points,
+            key=lambda index: (
+                4 * (geometry["points"][index][0] - shape["x"]) ** 2
+                + (geometry["points"][index][1] - shape["y"]) ** 2
+            ),
+        )
+        anchor_x, anchor_y = geometry["points"][anchor_index]
+        shape["bridges"] = [[
+            anchor_index,
+            anchor_x - shape["x"],
+            anchor_y - shape["y"],
+            "my",
+        ]]
+
+    somalia = max(countries["so"]["shapes"], key=lambda shape: shape["area"])
+    yemen = max(countries["ry"]["shapes"], key=lambda shape: shape["area"])
+    anchor_index = min(
+        yemen["pts"],
+        key=lambda index: (
+            4 * (geometry["points"][index][0] - somalia["x"]) ** 2
+            + (geometry["points"][index][1] - somalia["y"]) ** 2
+        ),
+    )
+    anchor_x, anchor_y = geometry["points"][anchor_index]
+    somalia["bridges"].append([
+        anchor_index,
+        anchor_x - somalia["x"],
+        anchor_y - somalia["y"],
+        "ry",
+    ])
     return geometry
 
 
@@ -87,12 +155,14 @@ def generate_measurements(args):
         field = measurement["id"]
         if field == "Area":
             continue
-        for density in (False, True):
-            key = f"{field}:density" if density else field
-            solver = Cartogram(geometry, max_speed=args.max_speed)
-            solver.set_target_weights(normalized_weights(measurements, field, density))
-            frames = solver.run(args.ticks, args.capture_every)
-            paths[key] = delta_frames(geometry["points"], frames, args.scale)
+        solver = Cartogram(geometry, max_speed=args.max_speed)
+        solver.set_target_weights(population_backfilled_weights(
+            measurements,
+            geometry["countries"],
+            field,
+        ))
+        frames = solver.run(args.ticks, args.capture_every)
+        paths[field] = delta_frames(geometry["points"], frames, args.scale)
 
     output = {
         "geometry": geometry["version"],
@@ -100,11 +170,39 @@ def generate_measurements(args):
         "ticks": args.ticks,
         "captureEvery": args.capture_every,
         "solverBridges": "canonical",
-        "missingData": "continent-average",
+        "expandedCountryLayouts": sorted(EXPANDED_COUNTRY_LAYOUTS),
+        "missingData": "continent-per-capita",
+        "measurements": manifest["measurements"],
         "paths": paths,
     }
     write_json(ROOT / args.output, output)
     write_json(ROOT / "static/measurements.json", measurements)
+
+
+def generate_population(args):
+    geometry = load_json(ROOT / "static/geometry.json")
+    mappings = load_json(ROOT / "data/country_mappings.json")
+    population = canonical_codes(load_json(ROOT / "data/population.json"), mappings)
+    frames = {}
+
+    for year in range(1800, 2101, 20):
+        solver = Cartogram(geometry, max_speed=args.max_speed)
+        solver.set_target_weights(population_weights(population, year))
+        solver.run(args.ticks)
+        solver.project_shapes(args.projection_passes)
+        frames[str(year)] = quantize(solver.points, args.scale)
+
+    write_json(ROOT / args.output, {
+        "geometry": geometry["version"],
+        "scale": args.scale,
+        "ticksPerFrame": args.ticks,
+        "mode": "independent",
+        "projectionPasses": args.projection_passes,
+        "solverBridges": "canonical",
+        "expandedCountryLayouts": sorted(EXPANDED_COUNTRY_LAYOUTS),
+        "missingData": "continent-average",
+        "frames": frames,
+    })
 
 
 def audit_data(args):
@@ -177,7 +275,7 @@ def render(geometry, points, path, *, scale=None):
         points = [[point[0] / scale, point[1] / scale] for point in points]
     image = Image.new("RGB", (720, 540), "#7785C0")
     draw = ImageDraw.Draw(image)
-    for country in geometry["countries"]:
+    for country in sorted(geometry["countries"], key=lambda item: item["weight"], reverse=True):
         if country["cc"] == "gl":
             continue
         for shape in country["shapes"]:
@@ -199,13 +297,14 @@ def compare_population(args):
         geometry = legacy_geometry(geometry)
     mappings = load_json(ROOT / "data/country_mappings.json")
     population = canonical_codes(load_json(ROOT / "data/population.json"), mappings)
-    shipped = load_json(ROOT / "static/population_frames.json")
+    shipped = load_json(ROOT / "baseline/population_frames.json.gz")
     years = [str(args.year)] if args.year else list(shipped["frames"])
     report = {
         "geometry": geometry["version"],
         "bridges": args.bridges,
         "ticks": args.ticks,
         "mode": args.mode,
+        "layout": args.layout,
         "countryCodes": "canonical",
         "frames": {},
     }
@@ -220,6 +319,7 @@ def compare_population(args):
             initial=initial,
             max_speed=args.max_speed,
             legacy_zero_missing=True,
+            expand_country_layout=args.layout == "expanded",
         )
         solver.set_target_weights(population_weights(population, year))
         solver.run(args.ticks)
@@ -247,8 +347,6 @@ def compare_population(args):
     report["summary"] = {
         "maximum": max(metrics["maximum"] for metrics in frame_metrics),
         "medianOfFrameMedians": median(metrics["median"] for metrics in frame_metrics),
-        "verdict": "The port is faithful, but does not reproduce the opaque shipped equilibria exactly.",
-        "decision": "Keep the shipped population frames as the visual baseline.",
     }
     write_json(output_directory / "report.json", report)
 
@@ -265,6 +363,14 @@ def parser():
     measurements.add_argument("--output", type=Path, default=Path("static/measurement_paths.json"))
     measurements.set_defaults(run=generate_measurements)
 
+    population = commands.add_parser("population")
+    population.add_argument("--ticks", type=int, default=1001)
+    population.add_argument("--max-speed", type=float, default=0.0005)
+    population.add_argument("--scale", type=int, default=10000)
+    population.add_argument("--projection-passes", type=int, default=5)
+    population.add_argument("--output", type=Path, default=Path("static/population_frames.json"))
+    population.set_defaults(run=generate_population)
+
     audit = commands.add_parser("audit")
     audit.add_argument("--output", type=Path, default=Path("baseline/data_audit.json"))
     audit.set_defaults(run=audit_data)
@@ -275,6 +381,7 @@ def parser():
     comparison.add_argument("--max-speed", type=float, default=0.0005)
     comparison.add_argument("--bridges", choices=("legacy", "canonical"), default="legacy")
     comparison.add_argument("--mode", choices=("independent", "continuation"), default="continuation")
+    comparison.add_argument("--layout", choices=("fixed", "expanded"), default="fixed")
     comparison.add_argument("--render", action="store_true")
     comparison.add_argument("--output", type=Path, default=Path("baseline/comparison"))
     comparison.set_defaults(run=compare_population)

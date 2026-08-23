@@ -6,7 +6,7 @@ time. They should share one map, one offline generator, and one browser player.
 
 ## Goals
 
-- Preserve the current output as the visual baseline.
+- Preserve the legacy output as a comparison baseline.
 - Make cartogram generation offline and reproducible.
 - Keep the browser code limited to loading, drawing, and interpolating frames.
 - Make every generated frame reproducible from committed source data.
@@ -14,9 +14,8 @@ time. They should share one map, one offline generator, and one browser player.
 - Keep population changes visually continuous without allowing distortion to
   accumulate over time.
 
-Improving cartogram quality is a separate, later project. The existing force
-model is the only implementation whose output has been used and judged. A new
-optimizer must be measured against it rather than assumed to be better.
+The existing force model and legacy frames provide the baseline. Generator
+changes must be measured against them rather than assumed to be better.
 
 ## Canonical geometry
 
@@ -98,36 +97,18 @@ generator settings.
 
 ## Population timeline
 
-Nearby years can have more than one valid equilibrium. Generating every year
-independently may select different equilibria and cause distracting movement
-that is unrelated to population.
-
-Population frames therefore use continuation:
-
-1. Generate 1800 from the canonical map.
-2. Gradually change the target values toward 1820.
-3. Use each converged solution to initialize the next step.
-4. At 1820, optimize fully using the objective anchored to the canonical map.
-5. Save the frame and continue toward 1840.
-
-The previous solution is only an initial condition. It is never the reference
-shape or position in the objective.
+Nearby years can have more than one valid equilibrium. Continuation initially
+seemed useful for visual stability, but it accumulated severe folds by the end
+of the timeline. Population frames therefore start independently from the
+canonical map. Five shape-projection passes then restore local templates and
+average shared border points before the frame is saved.
 
 ### Detecting drift and unstable equilibria
 
-For every published year:
-
-- run the continuation solution to convergence;
-- optionally solve independently from the canonical map; and
-- report objective scores and visual continuity.
-
-The complete sequence should also be generated backwards. A large difference
-between forward and backward results indicates an unstable equilibrium. This
-is initially a diagnostic report, not a build gate. We should define numerical
-thresholds and which result to ship before making it mandatory.
-
-If continuation does not produce stable results, the next step is a joint
-optimization of all years:
+Independent frames avoid drift but can still settle into different equilibria.
+The generator should report objective scores, overlap, invalid shapes, and
+movement between neighbouring years. If visual continuity becomes a problem,
+the next step is a joint optimization of all years:
 
 ```text
 sum(cartogram quality for each year)
@@ -250,14 +231,32 @@ forward/backward differences, and validation failures for every frame.
 ## Implementation status
 
 Both pages use the shared player and canonical geometry. World Sizer's
-relaxation paths are generated offline by the Python solver. Gapmover uses the
-preserved population frames because the missing historical harness prevents an
-exact regeneration. Baseline hashes, numerical comparisons, data coverage, and
-the one-megabyte compressed path budget are recorded in the repository.
+relaxation paths and Gapmover's population timeline are generated offline by
+the Python solver. The opaque legacy population frames remain as a compressed
+comparison baseline. Baseline hashes, numerical comparisons, data coverage,
+and the one-megabyte compressed path budget are recorded in the repository.
+
+Population years start independently from the base geometry. A short projection
+pass after relaxation restores local shape templates and averages coordinates
+at shared borders. This prevents distortions from accumulating across years and
+removes the long folded edges previously visible around the Horn of Africa and
+Southeast Asia.
 
 The force solver can still fold Canada's outline in extreme measurement paths.
 Preventing that without degrading the rest of the map requires a constrained
 optimizer rather than an extra bridge or a local post-processing step.
+
+Indonesia exposed a separate multi-shape layout problem. Newly generated paths
+scale its parts around the country's center and anchor Sumatra to the southern
+tip of Malaysia as a proxy for Singapore. Applying the same rule to every
+multi-shape country introduced new folds, so the change remains limited to the
+measured case.
+
+The Philippines keeps its original overall layout, but island bridges remain
+within the Philippine chain instead of tethering two shapes to Malaysia. This
+removes the severe internal overlap seen at high population multipliers without
+adding another country-specific layout scale. A bridge from China preserves
+separation when China's 1800 population multiplier expands toward the islands.
 
 The remaining work is source replacement: obtain maintained measurement and
 population datasets, define every historical mapping, regenerate the frames,

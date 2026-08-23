@@ -1,9 +1,0 @@
-[
-  {"countryCode":"so","field":"Living with Aids","value":"","resolution":"treated as missing"},
-  {"countryCode":"by","field":"Oil Production","value":"Belarus","resolution":"ignored; field is not offered"},
-  {"countryCode":"ge","field":"Oil Production","value":"Georgia","resolution":"ignored; field is not offered"},
-  {"countryCode":"nl","field":"Oil Production","value":"Netherlands","resolution":"ignored; field is not offered"},
-  {"countryCode":"tr","field":"Oil Production","value":"Turkey","resolution":"ignored; field is not offered"},
-  {"countryCode":"tz","field":"Covid Cases","value":"No data","resolution":"ignored; field is not offered"},
-  {"countryCode":"tz","field":"Covid Deaths","value":"No data","resolution":"ignored; field is not offered"}
-]

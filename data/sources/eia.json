@@ -1,0 +1,887 @@
+{
+  "dataset": "International Energy Data bulk download",
+  "downloadUrl": "https://www.eia.gov/opendata/bulk/INTL.zip",
+  "fields": {
+    "oil_production": {
+      "activityId": "1",
+      "label": "Crude oil production including lease condensate",
+      "missing": [
+        "kv",
+        "tf"
+      ],
+      "productId": "57",
+      "unit": "thousand barrels per day",
+      "values": {
+        "ae": {
+          "name": "United Arab Emirates",
+          "value": 3771.219178082192,
+          "year": 2025
+        },
+        "af": {
+          "name": "Afghanistan",
+          "value": 0,
+          "year": 2025
+        },
+        "al": {
+          "name": "Albania",
+          "value": 12.156394520547945,
+          "year": 2025
+        },
+        "am": {
+          "name": "Armenia",
+          "value": 0,
+          "year": 2025
+        },
+        "ao": {
+          "name": "Angola",
+          "value": 1030.8147238615236,
+          "year": 2025
+        },
+        "aq": {
+          "name": "Antarctica",
+          "value": 0,
+          "year": 2025
+        },
+        "ar": {
+          "name": "Argentina",
+          "value": 794.0044469152623,
+          "year": 2025
+        },
+        "at": {
+          "name": "Austria",
+          "value": 8.754980821917808,
+          "year": 2025
+        },
+        "au": {
+          "name": "Australia",
+          "value": 245.58340250301202,
+          "year": 2025
+        },
+        "az": {
+          "name": "Azerbaijan",
+          "value": 560.6209743572489,
+          "year": 2025
+        },
+        "ba": {
+          "name": "Bosnia and Herzegovina",
+          "value": 0,
+          "year": 2025
+        },
+        "bd": {
+          "name": "Bangladesh",
+          "value": 3,
+          "year": 2025
+        },
+        "be": {
+          "name": "Belgium",
+          "value": 0,
+          "year": 2025
+        },
+        "bf": {
+          "name": "Burkina Faso",
+          "value": 0,
+          "year": 2025
+        },
+        "bg": {
+          "name": "Bulgaria",
+          "value": 1,
+          "year": 2025
+        },
+        "bi": {
+          "name": "Burundi",
+          "value": 0,
+          "year": 2025
+        },
+        "bj": {
+          "name": "Benin",
+          "value": 0,
+          "year": 2025
+        },
+        "bn": {
+          "name": "Brunei Darussalam",
+          "value": 100.87573253662481,
+          "year": 2025
+        },
+        "bo": {
+          "name": "Bolivia",
+          "value": 17.660805479452055,
+          "year": 2025
+        },
+        "br": {
+          "name": "Brazil",
+          "value": 3769.407010164946,
+          "year": 2025
+        },
+        "bs": {
+          "name": "Bahamas",
+          "value": 0,
+          "year": 2025
+        },
+        "bt": {
+          "name": "Bhutan",
+          "value": 0,
+          "year": 2025
+        },
+        "bw": {
+          "name": "Botswana",
+          "value": 0,
+          "year": 2025
+        },
+        "by": {
+          "name": "Belarus",
+          "value": 25.730490410958904,
+          "year": 2025
+        },
+        "bz": {
+          "name": "Belize",
+          "value": 0.7871234,
+          "year": 2025
+        },
+        "ca": {
+          "name": "Canada",
+          "value": 4963.934906849316,
+          "year": 2025
+        },
+        "cf": {
+          "name": "Central African Republic",
+          "value": 0,
+          "year": 2025
+        },
+        "cg": {
+          "name": "Republic of Congo",
+          "value": 241.23561643835617,
+          "year": 2025
+        },
+        "ch": {
+          "name": "Switzerland",
+          "value": 0,
+          "year": 2025
+        },
+        "ci": {
+          "name": "C\u00f4te d'Ivoire",
+          "value": 55.09230825291715,
+          "year": 2025
+        },
+        "cl": {
+          "name": "Chile",
+          "value": 1.9683219693957577,
+          "year": 2025
+        },
+        "cm": {
+          "name": "Cameroon",
+          "value": 59.24383561643835,
+          "year": 2025
+        },
+        "cn": {
+          "name": "China",
+          "value": 4324.684931506849,
+          "year": 2025
+        },
+        "co": {
+          "name": "Colombia",
+          "value": 746.4789698630137,
+          "year": 2025
+        },
+        "cr": {
+          "name": "Costa Rica",
+          "value": 0,
+          "year": 2025
+        },
+        "cu": {
+          "name": "Cuba",
+          "value": 25.46308978224432,
+          "year": 2025
+        },
+        "cy": {
+          "name": "Cyprus",
+          "value": 0,
+          "year": 2025
+        },
+        "cz": {
+          "name": "Czech Republic",
+          "value": 1.3455506849315069,
+          "year": 2025
+        },
+        "de": {
+          "name": "Germany",
+          "value": 31.579964383561645,
+          "year": 2025
+        },
+        "dj": {
+          "name": "Djibouti",
+          "value": 0,
+          "year": 2025
+        },
+        "dk": {
+          "name": "Denmark",
+          "value": 71.81064217701133,
+          "year": 2025
+        },
+        "do": {
+          "name": "Dominican Republic",
+          "value": 0,
+          "year": 2025
+        },
+        "dz": {
+          "name": "Algeria",
+          "value": 1142.958904109589,
+          "year": 2025
+        },
+        "ec": {
+          "name": "Ecuador",
+          "value": 440.7002074273973,
+          "year": 2025
+        },
+        "ee": {
+          "name": "Estonia",
+          "value": 0,
+          "year": 2025
+        },
+        "eg": {
+          "name": "Egypt",
+          "value": 509.59632387793084,
+          "year": 2025
+        },
+        "eh": {
+          "name": "Western Sahara",
+          "value": 0,
+          "year": 2025
+        },
+        "er": {
+          "name": "Eritrea",
+          "value": 0,
+          "year": 2025
+        },
+        "es": {
+          "name": "Spain",
+          "value": 0.026504109589041095,
+          "year": 2025
+        },
+        "et": {
+          "name": "Ethiopia",
+          "value": 0,
+          "year": 2025
+        },
+        "fi": {
+          "name": "Finland",
+          "value": 0,
+          "year": 2025
+        },
+        "fj": {
+          "name": "Fiji",
+          "value": 0,
+          "year": 2025
+        },
+        "fk": {
+          "name": "Falkland Islands",
+          "value": 0,
+          "year": 2025
+        },
+        "fr": {
+          "name": "France",
+          "value": 10.221830136986302,
+          "year": 2025
+        },
+        "ga": {
+          "name": "Gabon",
+          "value": 239.31506849315068,
+          "year": 2025
+        },
+        "gb": {
+          "name": "United Kingdom",
+          "value": 615.7787123287671,
+          "year": 2025
+        },
+        "ge": {
+          "name": "Georgia",
+          "value": 0.22346849315068493,
+          "year": 2025
+        },
+        "gh": {
+          "name": "Ghana",
+          "value": 182.9808219178082,
+          "year": 2025
+        },
+        "gl": {
+          "name": "Greenland",
+          "value": 0,
+          "year": 2025
+        },
+        "gm": {
+          "name": "The Gambia",
+          "value": 0,
+          "year": 2025
+        },
+        "gn": {
+          "name": "Guinea",
+          "value": 0,
+          "year": 2025
+        },
+        "gq": {
+          "name": "Equatorial Guinea",
+          "value": 76.38650421252973,
+          "year": 2025
+        },
+        "gr": {
+          "name": "Greece",
+          "value": 1.497,
+          "year": 2025
+        },
+        "gt": {
+          "name": "Guatemala",
+          "value": 5.384625074259524,
+          "year": 2025
+        },
+        "gw": {
+          "name": "Guinea-Bissau",
+          "value": 0,
+          "year": 2025
+        },
+        "gy": {
+          "name": "Guyana",
+          "value": 747.4321424657534,
+          "year": 2025
+        },
+        "gz": {
+          "name": "Palestine",
+          "value": 0,
+          "year": 2025
+        },
+        "hn": {
+          "name": "Honduras",
+          "value": 0,
+          "year": 2025
+        },
+        "hr": {
+          "name": "Croatia",
+          "value": 8.996876712328767,
+          "year": 2025
+        },
+        "ht": {
+          "name": "Haiti",
+          "value": 0,
+          "year": 2025
+        },
+        "hu": {
+          "name": "Hungary",
+          "value": 23.419824657534246,
+          "year": 2025
+        },
+        "id": {
+          "name": "Indonesia",
+          "value": 581.668493150685,
+          "year": 2025
+        },
+        "ie": {
+          "name": "Ireland",
+          "value": 0,
+          "year": 2025
+        },
+        "il": {
+          "name": "Israel",
+          "value": 19.52054794520548,
+          "year": 2025
+        },
+        "in": {
+          "name": "India",
+          "value": 580.6003500561703,
+          "year": 2025
+        },
+        "iq": {
+          "name": "Iraq",
+          "value": 4388.068493150685,
+          "year": 2025
+        },
+        "ir": {
+          "name": "Iran",
+          "value": 4051.4246575342468,
+          "year": 2025
+        },
+        "is": {
+          "name": "Iceland",
+          "value": 0,
+          "year": 2025
+        },
+        "it": {
+          "name": "Italy",
+          "value": 83.70368493150684,
+          "year": 2025
+        },
+        "jm": {
+          "name": "Jamaica",
+          "value": 0,
+          "year": 2025
+        },
+        "jo": {
+          "name": "Jordan",
+          "value": 0.02,
+          "year": 2025
+        },
+        "jp": {
+          "name": "Japan",
+          "value": 3.1066301369863014,
+          "year": 2025
+        },
+        "ke": {
+          "name": "Kenya",
+          "value": 0,
+          "year": 2025
+        },
+        "kg": {
+          "name": "Kyrgyzstan",
+          "value": 5.5434027397260275,
+          "year": 2025
+        },
+        "kh": {
+          "name": "Cambodia",
+          "value": 0,
+          "year": 2025
+        },
+        "kp": {
+          "name": "Dem. Rep. Korea",
+          "value": 0,
+          "year": 2025
+        },
+        "kr": {
+          "name": "Republic of Korea",
+          "value": 0,
+          "year": 2025
+        },
+        "kw": {
+          "name": "Kuwait",
+          "value": 2583.5479452054797,
+          "year": 2025
+        },
+        "kz": {
+          "name": "Kazakhstan",
+          "value": 2046.610159015274,
+          "year": 2025
+        },
+        "la": {
+          "name": "Lao PDR",
+          "value": 0,
+          "year": 2025
+        },
+        "lb": {
+          "name": "Lebanon",
+          "value": 0,
+          "year": 2025
+        },
+        "lk": {
+          "name": "Sri Lanka",
+          "value": 0,
+          "year": 2025
+        },
+        "lr": {
+          "name": "Liberia",
+          "value": 0,
+          "year": 2025
+        },
+        "ls": {
+          "name": "Lesotho",
+          "value": 0,
+          "year": 2025
+        },
+        "lt": {
+          "name": "Lithuania",
+          "value": 0.7,
+          "year": 2025
+        },
+        "lu": {
+          "name": "Luxembourg",
+          "value": 0,
+          "year": 2025
+        },
+        "lv": {
+          "name": "Latvia",
+          "value": 0,
+          "year": 2025
+        },
+        "ly": {
+          "name": "Libya",
+          "value": 1363.041095890411,
+          "year": 2025
+        },
+        "ma": {
+          "name": "Morocco",
+          "value": 0.025,
+          "year": 2025
+        },
+        "md": {
+          "name": "Moldova",
+          "value": 0,
+          "year": 2025
+        },
+        "me": {
+          "name": "Montenegro",
+          "value": 0,
+          "year": 2025
+        },
+        "mg": {
+          "name": "Madagascar",
+          "value": 0,
+          "year": 2025
+        },
+        "mk": {
+          "name": "Macedonia",
+          "value": 0,
+          "year": 2025
+        },
+        "ml": {
+          "name": "Mali",
+          "value": 0,
+          "year": 2025
+        },
+        "mm": {
+          "name": "Myanmar",
+          "value": 5.555309589041096,
+          "year": 2025
+        },
+        "mn": {
+          "name": "Mongolia",
+          "value": 13.671846575342466,
+          "year": 2025
+        },
+        "mr": {
+          "name": "Mauritania",
+          "value": 0,
+          "year": 2025
+        },
+        "mw": {
+          "name": "Malawi",
+          "value": 0,
+          "year": 2025
+        },
+        "mx": {
+          "name": "Mexico",
+          "value": 1726.046087671233,
+          "year": 2025
+        },
+        "my": {
+          "name": "Malaysia",
+          "value": 512.6701369863014,
+          "year": 2025
+        },
+        "mz": {
+          "name": "Mozambique",
+          "value": 0,
+          "year": 2025
+        },
+        "na": {
+          "name": "Namibia",
+          "value": 0,
+          "year": 2025
+        },
+        "nc": {
+          "name": "New Caledonia",
+          "value": 0,
+          "year": 2025
+        },
+        "ne": {
+          "name": "Niger",
+          "value": 101.41095890410959,
+          "year": 2025
+        },
+        "ng": {
+          "name": "Nigeria",
+          "value": 1605.4142781736975,
+          "year": 2025
+        },
+        "ni": {
+          "name": "Nicaragua",
+          "value": 0,
+          "year": 2025
+        },
+        "nl": {
+          "name": "Netherlands",
+          "value": 21.469768621528573,
+          "year": 2025
+        },
+        "no": {
+          "name": "Norway",
+          "value": 1858.4642345479451,
+          "year": 2025
+        },
+        "np": {
+          "name": "Nepal",
+          "value": 0,
+          "year": 2025
+        },
+        "nz": {
+          "name": "New Zealand",
+          "value": 7.914704109589041,
+          "year": 2025
+        },
+        "om": {
+          "name": "Oman",
+          "value": 1002.0691753424658,
+          "year": 2025
+        },
+        "pa": {
+          "name": "Panama",
+          "value": 0,
+          "year": 2025
+        },
+        "pe": {
+          "name": "Peru",
+          "value": 44.152745205479455,
+          "year": 2025
+        },
+        "pg": {
+          "name": "Papua New Guinea",
+          "value": 31.515898630136988,
+          "year": 2025
+        },
+        "ph": {
+          "name": "Philippines",
+          "value": 0.502972602739726,
+          "year": 2025
+        },
+        "pk": {
+          "name": "Pakistan",
+          "value": 57.51526766573127,
+          "year": 2025
+        },
+        "pl": {
+          "name": "Poland",
+          "value": 16.541194520547947,
+          "year": 2025
+        },
+        "pr": {
+          "name": "Puerto Rico",
+          "value": 0,
+          "year": 2025
+        },
+        "pt": {
+          "name": "Portugal",
+          "value": 0,
+          "year": 2025
+        },
+        "py": {
+          "name": "Paraguay",
+          "value": 0,
+          "year": 2025
+        },
+        "qa": {
+          "name": "Qatar",
+          "value": 1297.384436580822,
+          "year": 2025
+        },
+        "ro": {
+          "name": "Romania",
+          "value": 51.54805205479452,
+          "year": 2025
+        },
+        "ru": {
+          "name": "Russian Federation",
+          "value": 9885.10903296257,
+          "year": 2025
+        },
+        "rw": {
+          "name": "Rwanda",
+          "value": 0,
+          "year": 2025
+        },
+        "ry": {
+          "name": "Yemen",
+          "value": 15,
+          "year": 2025
+        },
+        "sa": {
+          "name": "Saudi Arabia",
+          "value": 9556.054035616438,
+          "year": 2025
+        },
+        "sb": {
+          "name": "Solomon Islands",
+          "value": 0,
+          "year": 2025
+        },
+        "sd": {
+          "name": "Sudan",
+          "value": 30,
+          "year": 2025
+        },
+        "se": {
+          "name": "Sweden",
+          "value": 0,
+          "year": 2025
+        },
+        "si": {
+          "name": "Slovenia",
+          "value": 0,
+          "year": 2025
+        },
+        "sk": {
+          "name": "Slovakia",
+          "value": 0.018556164383561644,
+          "year": 2025
+        },
+        "sl": {
+          "name": "Sierra Leone",
+          "value": 0,
+          "year": 2025
+        },
+        "sn": {
+          "name": "Senegal",
+          "value": 100,
+          "year": 2025
+        },
+        "so": {
+          "name": "Somalia",
+          "value": 0,
+          "year": 2025
+        },
+        "sr": {
+          "name": "Suriname",
+          "value": 12.08945095890411,
+          "year": 2025
+        },
+        "ss": {
+          "name": "South Sudan",
+          "value": 112.65753424657534,
+          "year": 2025
+        },
+        "sv": {
+          "name": "El Salvador",
+          "value": 0,
+          "year": 2025
+        },
+        "sy": {
+          "name": "Syria",
+          "value": 75.24657534246575,
+          "year": 2025
+        },
+        "sz": {
+          "name": "Swaziland",
+          "value": 0,
+          "year": 2025
+        },
+        "td": {
+          "name": "Chad",
+          "value": 126.4904109589041,
+          "year": 2025
+        },
+        "tg": {
+          "name": "Togo",
+          "value": 0,
+          "year": 2025
+        },
+        "th": {
+          "name": "Thailand",
+          "value": 161.57890410958905,
+          "year": 2025
+        },
+        "tj": {
+          "name": "Tajikistan",
+          "value": 0.316,
+          "year": 2025
+        },
+        "tm": {
+          "name": "Turkmenistan",
+          "value": 190.65793,
+          "year": 2025
+        },
+        "tn": {
+          "name": "Tunisia",
+          "value": 25.326027397260273,
+          "year": 2025
+        },
+        "tp": {
+          "name": "Timor-Leste",
+          "value": 2,
+          "year": 2025
+        },
+        "tr": {
+          "name": "Turkey",
+          "value": 124.61568767123288,
+          "year": 2025
+        },
+        "tt": {
+          "name": "Trinidad and Tobago",
+          "value": 51.19955070497243,
+          "year": 2025
+        },
+        "tw": {
+          "name": "Taiwan",
+          "value": 0.196,
+          "year": 2025
+        },
+        "tz": {
+          "name": "Tanzania",
+          "value": 0,
+          "year": 2025
+        },
+        "ua": {
+          "name": "Ukraine",
+          "value": 0,
+          "year": 2025
+        },
+        "ug": {
+          "name": "Uganda",
+          "value": 0,
+          "year": 2025
+        },
+        "us": {
+          "name": "United States",
+          "value": 13586.086904109588,
+          "year": 2025
+        },
+        "uy": {
+          "name": "Uruguay",
+          "value": 0,
+          "year": 2025
+        },
+        "uz": {
+          "name": "Uzbekistan",
+          "value": 29.583860273972604,
+          "year": 2025
+        },
+        "ve": {
+          "name": "Venezuela",
+          "value": 972.6164383561644,
+          "year": 2025
+        },
+        "vn": {
+          "name": "Vietnam",
+          "value": 164.66995616438356,
+          "year": 2025
+        },
+        "vu": {
+          "name": "Vanuatu",
+          "value": 0,
+          "year": 2025
+        },
+        "yf": {
+          "name": "Serbia",
+          "value": 11.480917808219179,
+          "year": 2025
+        },
+        "za": {
+          "name": "South Africa",
+          "value": 0.3709150684931507,
+          "year": 2025
+        },
+        "zm": {
+          "name": "Zambia",
+          "value": 0,
+          "year": 2025
+        },
+        "zr": {
+          "name": "Democratic Republic of the Congo",
+          "value": 16,
+          "year": 2025
+        },
+        "zw": {
+          "name": "Zimbabwe",
+          "value": 0,
+          "year": 2025
+        }
+      }
+    }
+  },
+  "referenceYear": 2025,
+  "retrieved": "2026-08-22",
+  "source": "U.S. Energy Information Administration",
+  "sourceUrl": "https://www.eia.gov/international/data/world/petroleum-and-other-liquids/annual-petroleum-and-other-liquids-production"
+}

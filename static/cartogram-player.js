@@ -99,7 +99,8 @@ class CartogramPlayer {
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         context.strokeStyle = '#303030';
 
-        for (const country of this.geometry.countries) {
+        const countries = [...this.geometry.countries].sort((left, right) => right.weight - left.weight);
+        for (const country of countries) {
             if (excluded.has(country.cc)) continue;
             context.fillStyle = this.colors[country.continent];
             for (const shape of country.shapes) {

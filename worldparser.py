@@ -13,6 +13,7 @@ CC_CODES = {
 }
 
 EXTRA_BRIDGES = [
+    ('cn', 'ph'),
     ('es', 'ma'),
     ('it', 'al'),
     ('it', 'es'),
@@ -21,11 +22,11 @@ EXTRA_BRIDGES = [
     ('tn', 'it'),
     ('tr', 'gr'),
     ('se', 'dk'),
-    ('ry', 'so'),
     ('nz', 'au'),
 ]
 
-ISLAND_ANCHORS = {'is': 'gb'}
+ISLAND_ANCHORS = {'is': 'gb', 'id': 'my'}
+INTERNAL_ISLAND_ANCHORS = {'ph'}
 ENCLAVES = {'ls': 'za'}
 
 
@@ -245,14 +246,35 @@ def build_geometry(source='data/ne_110m_admin_0_countries'):
     countries_by_cc = {country['cc']: country for country in countries}
 
     for island_code, anchor_code in ISLAND_ANCHORS.items():
-        island = max(countries_by_cc[island_code]['shapes'], key=lambda shape: shape['area'])
+        island = max(
+            (
+                shape for shape in countries_by_cc[island_code]['shapes']
+                if shape['island']
+            ),
+            key=lambda shape: shape['area'],
+        )
+        anchor_shapes = countries_by_cc[anchor_code]['shapes']
+        if island_code == anchor_code:
+            anchor_shapes = [shape for shape in anchor_shapes if shape is not island]
         island['bridges'] = []
         add_bridge(
             island,
-            countries_by_cc[anchor_code]['shapes'],
+            anchor_shapes,
             all_points,
             anchor_code,
         )
+
+    for country_code in INTERNAL_ISLAND_ANCHORS:
+        shapes = countries_by_cc[country_code]['shapes']
+        for shape in shapes:
+            if any(bridge[3] != country_code for bridge in shape['bridges']):
+                shape['bridges'] = []
+                add_bridge(
+                    shape,
+                    [other for other in shapes if other is not shape],
+                    all_points,
+                    country_code,
+                )
 
     for enclave_code, container_code in ENCLAVES.items():
         enclave = max(countries_by_cc[enclave_code]['shapes'], key=lambda shape: shape['area'])

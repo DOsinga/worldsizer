@@ -14,6 +14,8 @@ COLORS = {
     "Seven seas (open ocean)": "#AFAF00",
 }
 
+EXPANDED_COUNTRY_LAYOUTS = {"id"}
+
 
 def geometry_version(geometry):
     content = json.dumps(
@@ -25,21 +27,52 @@ def geometry_version(geometry):
     return f"world-{hashlib.sha256(content).hexdigest()[:12]}"
 
 
-def normalized_weights(data, field, density=False):
+def normalized_weights(data, field):
     weights = {}
     for country_code, values in data.items():
         if field not in values:
             continue
         value = values[field]
-        if density and values.get("Population"):
-            if not values.get("Area"):
-                raise ValueError(f"{country_code} has population but no area")
-            value /= values["Population"] / values["Area"]
         weights[country_code] = value
     total = sum(weights.values())
     if not math.isfinite(total) or total <= 0:
         raise ValueError(f"{field} has no positive finite total")
     return {country_code: value / total for country_code, value in weights.items()}
+
+
+def population_backfilled_weights(data, countries, field):
+    continent_values = {}
+    continent_populations = {}
+    for country in countries:
+        values = data[country["cc"]]
+        value = values.get(field)
+        population = values.get("Population")
+        if not isinstance(value, (int, float)) or not population:
+            continue
+        continent = country["continent"]
+        continent_values[continent] = continent_values.get(continent, 0) + value
+        continent_populations[continent] = continent_populations.get(continent, 0) + population
+
+    filled = {}
+    for country in countries:
+        country_code = country["cc"]
+        values = data[country_code]
+        if field in values or not values.get("Population"):
+            filled[country_code] = values
+            continue
+        continent = country["continent"]
+        if not continent_populations.get(continent):
+            filled[country_code] = values
+            continue
+        filled[country_code] = {
+            **values,
+            field: (
+                values["Population"]
+                * continent_values[continent]
+                / continent_populations[continent]
+            ),
+        }
+    return normalized_weights(filled, field)
 
 
 def population_weights(data, year):
@@ -68,13 +101,29 @@ def polygon_area(point_indices, points):
 
 
 class Cartogram:
-    def __init__(self, geometry, *, initial=None, max_speed=0.002, legacy_zero_missing=False):
+    def __init__(
+        self,
+        geometry,
+        *,
+        initial=None,
+        max_speed=0.002,
+        legacy_zero_missing=False,
+        expand_country_layout=True,
+    ):
         self.base = geometry["points"]
         self.points = [list(point) for point in initial or self.base]
         self.countries = geometry["countries"]
         self.country_codes = {country["cc"] for country in self.countries}
         self.max_speed = max_speed
         self.legacy_zero_missing = legacy_zero_missing
+        self.expand_country_layout = expand_country_layout
+        self.country_centers = []
+        for country in self.countries:
+            area = sum(shape["area"] for shape in country["shapes"])
+            self.country_centers.append((
+                sum(shape["x"] * shape["area"] for shape in country["shapes"]) / area,
+                sum(shape["y"] * shape["area"] for shape in country["shapes"]) / area,
+            ))
         self.multipliers = []
         self.loss = 0.0
 
@@ -118,12 +167,19 @@ class Cartogram:
         for country_index, country in enumerate(self.countries):
             multiplier = self.multipliers[country_index]
             target_sqrt = math.sqrt(multiplier)
+            country_x, country_y = self.country_centers[country_index]
             for shape in country["shapes"]:
                 shape_points = shape["pts"]
                 center_x = sum(self.points[index][0] for index in shape_points) / len(shape_points)
                 center_y = sum(self.points[index][1] for index in shape_points) / len(shape_points)
-                home_x = shape["x"] - center_x
-                home_y = shape["y"] - center_y
+                if self.expand_country_layout and country["cc"] in EXPANDED_COUNTRY_LAYOUTS:
+                    target_x = country_x + (shape["x"] - country_x) * target_sqrt
+                    target_y = country_y + (shape["y"] - country_y) * target_sqrt
+                else:
+                    target_x = shape["x"]
+                    target_y = shape["y"]
+                home_x = target_x - center_x
+                home_y = target_y - center_y
                 bridge_sum_x = 0.0
                 bridge_sum_y = 0.0
 
@@ -180,6 +236,26 @@ class Cartogram:
             next_points.append([point[0] + dx, point[1] + dy])
         self.points = next_points
         return self.loss
+
+    def project_shapes(self, iterations):
+        for _ in range(iterations):
+            projected = [[0.0, 0.0, 0] for _ in self.points]
+            for country_index, country in enumerate(self.countries):
+                scale = math.sqrt(self.multipliers[country_index])
+                for shape in country["shapes"]:
+                    shape_points = shape["pts"]
+                    center_x = sum(self.points[index][0] for index in shape_points) / len(shape_points)
+                    center_y = sum(self.points[index][1] for index in shape_points) / len(shape_points)
+                    for point_index in shape_points:
+                        point = projected[point_index]
+                        point[0] += center_x + (self.base[point_index][0] - shape["x"]) * scale
+                        point[1] += center_y + (self.base[point_index][1] - shape["y"]) * scale
+                        point[2] += 1
+            self.points = [
+                [x / count, y / count] if count else point
+                for point, (x, y, count) in zip(self.points, projected)
+            ]
+        return self.points
 
     def run(self, ticks, capture_every=None):
         frames = []

@@ -1,0 +1,891 @@
+{
+  "downloadUrl": "https://historical.medalspercapita.com/data.js",
+  "fields": {
+    "olympic_medals": {
+      "label": "Olympic medals won across all Summer and Winter Games",
+      "missing": [],
+      "unit": "medals",
+      "values": {
+        "ae": {
+          "name": "United Arab Emirates",
+          "value": 0,
+          "year": 2024
+        },
+        "af": {
+          "name": "Afghanistan",
+          "value": 2,
+          "year": 2024
+        },
+        "al": {
+          "name": "Albania",
+          "value": 2,
+          "year": 2024
+        },
+        "am": {
+          "name": "Armenia",
+          "value": 24,
+          "year": 2024
+        },
+        "ao": {
+          "name": "Angola",
+          "value": 0,
+          "year": 2024
+        },
+        "aq": {
+          "name": "Antarctica",
+          "value": 0,
+          "year": 2024
+        },
+        "ar": {
+          "name": "Argentina",
+          "value": 80,
+          "year": 2024
+        },
+        "at": {
+          "name": "Austria",
+          "value": 349,
+          "year": 2024
+        },
+        "au": {
+          "name": "Australia",
+          "value": 614,
+          "year": 2024
+        },
+        "az": {
+          "name": "Azerbaijan",
+          "value": 58,
+          "year": 2024
+        },
+        "ba": {
+          "name": "Bosnia and Herzegovina",
+          "value": 0,
+          "year": 2024
+        },
+        "bd": {
+          "name": "Bangladesh",
+          "value": 0,
+          "year": 2024
+        },
+        "be": {
+          "name": "Belgium",
+          "value": 173,
+          "year": 2024
+        },
+        "bf": {
+          "name": "Burkina Faso",
+          "value": 0,
+          "year": 2024
+        },
+        "bg": {
+          "name": "Bulgaria",
+          "value": 0,
+          "year": 2024
+        },
+        "bi": {
+          "name": "Burundi",
+          "value": 2,
+          "year": 2024
+        },
+        "bj": {
+          "name": "Benin",
+          "value": 0,
+          "year": 2024
+        },
+        "bn": {
+          "name": "Brunei Darussalam",
+          "value": 9,
+          "year": 2024
+        },
+        "bo": {
+          "name": "Bolivia",
+          "value": 0,
+          "year": 2024
+        },
+        "br": {
+          "name": "Brazil",
+          "value": 168,
+          "year": 2024
+        },
+        "bs": {
+          "name": "Bahamas",
+          "value": 0,
+          "year": 2024
+        },
+        "bt": {
+          "name": "Bhutan",
+          "value": 0,
+          "year": 2024
+        },
+        "bw": {
+          "name": "Botswana",
+          "value": 0,
+          "year": 2024
+        },
+        "by": {
+          "name": "Belarus",
+          "value": 114,
+          "year": 2024
+        },
+        "bz": {
+          "name": "Belize",
+          "value": 0,
+          "year": 2024
+        },
+        "ca": {
+          "name": "Canada",
+          "value": 576,
+          "year": 2024
+        },
+        "cf": {
+          "name": "Central African Republic",
+          "value": 0,
+          "year": 2024
+        },
+        "cg": {
+          "name": "Republic of Congo",
+          "value": 0,
+          "year": 2024
+        },
+        "ch": {
+          "name": "Switzerland",
+          "value": 0,
+          "year": 2024
+        },
+        "ci": {
+          "name": "C\u00f4te d'Ivoire",
+          "value": 4,
+          "year": 2024
+        },
+        "cl": {
+          "name": "Chile",
+          "value": 0,
+          "year": 2024
+        },
+        "cm": {
+          "name": "Cameroon",
+          "value": 5,
+          "year": 2024
+        },
+        "cn": {
+          "name": "China",
+          "value": 799,
+          "year": 2024
+        },
+        "co": {
+          "name": "Colombia",
+          "value": 36,
+          "year": 2024
+        },
+        "cr": {
+          "name": "Costa Rica",
+          "value": 0,
+          "year": 2024
+        },
+        "cu": {
+          "name": "Cuba",
+          "value": 243,
+          "year": 2024
+        },
+        "cy": {
+          "name": "Cyprus",
+          "value": 2,
+          "year": 2024
+        },
+        "cz": {
+          "name": "Czech Republic",
+          "value": 102,
+          "year": 2024
+        },
+        "de": {
+          "name": "Germany",
+          "value": 0,
+          "year": 2024
+        },
+        "dj": {
+          "name": "Djibouti",
+          "value": 1,
+          "year": 2024
+        },
+        "dk": {
+          "name": "Denmark",
+          "value": 0,
+          "year": 2024
+        },
+        "do": {
+          "name": "Dominican Republic",
+          "value": 15,
+          "year": 2024
+        },
+        "dz": {
+          "name": "Algeria",
+          "value": 0,
+          "year": 2024
+        },
+        "ec": {
+          "name": "Ecuador",
+          "value": 10,
+          "year": 2024
+        },
+        "ee": {
+          "name": "Estonia",
+          "value": 44,
+          "year": 2024
+        },
+        "eg": {
+          "name": "Egypt",
+          "value": 38,
+          "year": 2024
+        },
+        "eh": {
+          "name": "Western Sahara",
+          "value": 0,
+          "year": 2024
+        },
+        "er": {
+          "name": "Eritrea",
+          "value": 1,
+          "year": 2024
+        },
+        "es": {
+          "name": "Spain",
+          "value": 187,
+          "year": 2024
+        },
+        "et": {
+          "name": "Ethiopia",
+          "value": 61,
+          "year": 2024
+        },
+        "fi": {
+          "name": "Finland",
+          "value": 480,
+          "year": 2024
+        },
+        "fj": {
+          "name": "Fiji",
+          "value": 0,
+          "year": 2024
+        },
+        "fk": {
+          "name": "Falkland Islands",
+          "value": 0,
+          "year": 2024
+        },
+        "fr": {
+          "name": "France",
+          "value": 947,
+          "year": 2024
+        },
+        "ga": {
+          "name": "Gabon",
+          "value": 1,
+          "year": 2024
+        },
+        "gb": {
+          "name": "United Kingdom",
+          "value": 1008,
+          "year": 2024
+        },
+        "ge": {
+          "name": "Georgia",
+          "value": 47,
+          "year": 2024
+        },
+        "gh": {
+          "name": "Ghana",
+          "value": 5,
+          "year": 2024
+        },
+        "gl": {
+          "name": "Greenland",
+          "value": 0,
+          "year": 2024
+        },
+        "gm": {
+          "name": "The Gambia",
+          "value": 0,
+          "year": 2024
+        },
+        "gn": {
+          "name": "Guinea",
+          "value": 0,
+          "year": 2024
+        },
+        "gq": {
+          "name": "Equatorial Guinea",
+          "value": 0,
+          "year": 2024
+        },
+        "gr": {
+          "name": "Greece",
+          "value": 0,
+          "year": 2024
+        },
+        "gt": {
+          "name": "Guatemala",
+          "value": 0,
+          "year": 2024
+        },
+        "gw": {
+          "name": "Guinea-Bissau",
+          "value": 0,
+          "year": 2024
+        },
+        "gy": {
+          "name": "Guyana",
+          "value": 1,
+          "year": 2024
+        },
+        "gz": {
+          "name": "Palestine",
+          "value": 0,
+          "year": 2024
+        },
+        "hn": {
+          "name": "Honduras",
+          "value": 0,
+          "year": 2024
+        },
+        "hr": {
+          "name": "Croatia",
+          "value": 0,
+          "year": 2024
+        },
+        "ht": {
+          "name": "Haiti",
+          "value": 0,
+          "year": 2024
+        },
+        "hu": {
+          "name": "Hungary",
+          "value": 540,
+          "year": 2024
+        },
+        "id": {
+          "name": "Indonesia",
+          "value": 0,
+          "year": 2024
+        },
+        "ie": {
+          "name": "Ireland",
+          "value": 42,
+          "year": 2024
+        },
+        "il": {
+          "name": "Israel",
+          "value": 20,
+          "year": 2024
+        },
+        "in": {
+          "name": "India",
+          "value": 41,
+          "year": 2024
+        },
+        "iq": {
+          "name": "Iraq",
+          "value": 1,
+          "year": 2024
+        },
+        "ir": {
+          "name": "Iran",
+          "value": 0,
+          "year": 2024
+        },
+        "is": {
+          "name": "Iceland",
+          "value": 4,
+          "year": 2024
+        },
+        "it": {
+          "name": "Italy",
+          "value": 799,
+          "year": 2024
+        },
+        "jm": {
+          "name": "Jamaica",
+          "value": 93,
+          "year": 2024
+        },
+        "jo": {
+          "name": "Jordan",
+          "value": 4,
+          "year": 2024
+        },
+        "jp": {
+          "name": "Japan",
+          "value": 618,
+          "year": 2024
+        },
+        "ke": {
+          "name": "Kenya",
+          "value": 120,
+          "year": 2024
+        },
+        "kg": {
+          "name": "Kyrgyzstan",
+          "value": 12,
+          "year": 2024
+        },
+        "kh": {
+          "name": "Cambodia",
+          "value": 0,
+          "year": 2024
+        },
+        "kp": {
+          "name": "Dem. Rep. Korea",
+          "value": 62,
+          "year": 2024
+        },
+        "kr": {
+          "name": "Republic of Korea",
+          "value": 395,
+          "year": 2024
+        },
+        "kv": {
+          "name": "Kosovo",
+          "value": 0,
+          "year": 2024
+        },
+        "kw": {
+          "name": "Kuwait",
+          "value": 0,
+          "year": 2024
+        },
+        "kz": {
+          "name": "Kazakhstan",
+          "value": 92,
+          "year": 2024
+        },
+        "la": {
+          "name": "Lao PDR",
+          "value": 0,
+          "year": 2024
+        },
+        "lb": {
+          "name": "Lebanon",
+          "value": 0,
+          "year": 2024
+        },
+        "lk": {
+          "name": "Sri Lanka",
+          "value": 0,
+          "year": 2024
+        },
+        "lr": {
+          "name": "Liberia",
+          "value": 0,
+          "year": 2024
+        },
+        "ls": {
+          "name": "Lesotho",
+          "value": 0,
+          "year": 2024
+        },
+        "lt": {
+          "name": "Lithuania",
+          "value": 30,
+          "year": 2024
+        },
+        "lu": {
+          "name": "Luxembourg",
+          "value": 4,
+          "year": 2024
+        },
+        "lv": {
+          "name": "Latvia",
+          "value": 0,
+          "year": 2024
+        },
+        "ly": {
+          "name": "Libya",
+          "value": 0,
+          "year": 2024
+        },
+        "ma": {
+          "name": "Morocco",
+          "value": 26,
+          "year": 2024
+        },
+        "md": {
+          "name": "Moldova",
+          "value": 13,
+          "year": 2024
+        },
+        "me": {
+          "name": "Montenegro",
+          "value": 1,
+          "year": 2024
+        },
+        "mg": {
+          "name": "Madagascar",
+          "value": 0,
+          "year": 2024
+        },
+        "mk": {
+          "name": "Macedonia",
+          "value": 2,
+          "year": 2024
+        },
+        "ml": {
+          "name": "Mali",
+          "value": 0,
+          "year": 2024
+        },
+        "mm": {
+          "name": "Myanmar",
+          "value": 0,
+          "year": 2024
+        },
+        "mn": {
+          "name": "Mongolia",
+          "value": 0,
+          "year": 2024
+        },
+        "mr": {
+          "name": "Mauritania",
+          "value": 0,
+          "year": 2024
+        },
+        "mw": {
+          "name": "Malawi",
+          "value": 0,
+          "year": 2024
+        },
+        "mx": {
+          "name": "Mexico",
+          "value": 76,
+          "year": 2024
+        },
+        "my": {
+          "name": "Malaysia",
+          "value": 0,
+          "year": 2024
+        },
+        "mz": {
+          "name": "Mozambique",
+          "value": 2,
+          "year": 2024
+        },
+        "na": {
+          "name": "Namibia",
+          "value": 5,
+          "year": 2024
+        },
+        "nc": {
+          "name": "New Caledonia",
+          "value": 0,
+          "year": 2024
+        },
+        "ne": {
+          "name": "Niger",
+          "value": 0,
+          "year": 2024
+        },
+        "ng": {
+          "name": "Nigeria",
+          "value": 0,
+          "year": 2024
+        },
+        "ni": {
+          "name": "Nicaragua",
+          "value": 0,
+          "year": 2024
+        },
+        "nl": {
+          "name": "Netherlands",
+          "value": 0,
+          "year": 2024
+        },
+        "no": {
+          "name": "Norway",
+          "value": 574,
+          "year": 2024
+        },
+        "np": {
+          "name": "Nepal",
+          "value": 0,
+          "year": 2024
+        },
+        "nz": {
+          "name": "New Zealand",
+          "value": 163,
+          "year": 2024
+        },
+        "om": {
+          "name": "Oman",
+          "value": 0,
+          "year": 2024
+        },
+        "pa": {
+          "name": "Panama",
+          "value": 4,
+          "year": 2024
+        },
+        "pe": {
+          "name": "Peru",
+          "value": 5,
+          "year": 2024
+        },
+        "pg": {
+          "name": "Papua New Guinea",
+          "value": 0,
+          "year": 2024
+        },
+        "ph": {
+          "name": "Philippines",
+          "value": 0,
+          "year": 2024
+        },
+        "pk": {
+          "name": "Pakistan",
+          "value": 11,
+          "year": 2024
+        },
+        "pl": {
+          "name": "Poland",
+          "value": 329,
+          "year": 2024
+        },
+        "pr": {
+          "name": "Puerto Rico",
+          "value": 0,
+          "year": 2024
+        },
+        "pt": {
+          "name": "Portugal",
+          "value": 0,
+          "year": 2024
+        },
+        "py": {
+          "name": "Paraguay",
+          "value": 0,
+          "year": 2024
+        },
+        "qa": {
+          "name": "Qatar",
+          "value": 9,
+          "year": 2024
+        },
+        "ro": {
+          "name": "Romania",
+          "value": 320,
+          "year": 2024
+        },
+        "ru": {
+          "name": "Russian Federation",
+          "value": 689,
+          "year": 2024
+        },
+        "rw": {
+          "name": "Rwanda",
+          "value": 0,
+          "year": 2024
+        },
+        "ry": {
+          "name": "Yemen",
+          "value": 0,
+          "year": 2024
+        },
+        "sa": {
+          "name": "Saudi Arabia",
+          "value": 0,
+          "year": 2024
+        },
+        "sb": {
+          "name": "Solomon Islands",
+          "value": 0,
+          "year": 2024
+        },
+        "sd": {
+          "name": "Sudan",
+          "value": 0,
+          "year": 2024
+        },
+        "se": {
+          "name": "Sweden",
+          "value": 690,
+          "year": 2024
+        },
+        "si": {
+          "name": "Slovenia",
+          "value": 0,
+          "year": 2024
+        },
+        "sk": {
+          "name": "Slovakia",
+          "value": 43,
+          "year": 2024
+        },
+        "sl": {
+          "name": "Sierra Leone",
+          "value": 0,
+          "year": 2024
+        },
+        "sn": {
+          "name": "Senegal",
+          "value": 1,
+          "year": 2024
+        },
+        "so": {
+          "name": "Somalia",
+          "value": 0,
+          "year": 2024
+        },
+        "sr": {
+          "name": "Suriname",
+          "value": 2,
+          "year": 2024
+        },
+        "ss": {
+          "name": "South Sudan",
+          "value": 0,
+          "year": 2024
+        },
+        "sv": {
+          "name": "El Salvador",
+          "value": 0,
+          "year": 2024
+        },
+        "sy": {
+          "name": "Syria",
+          "value": 4,
+          "year": 2024
+        },
+        "sz": {
+          "name": "Swaziland",
+          "value": 0,
+          "year": 2024
+        },
+        "td": {
+          "name": "Chad",
+          "value": 0,
+          "year": 2024
+        },
+        "tf": {
+          "name": "French Southern and Antarctic Lands",
+          "value": 0,
+          "year": 2024
+        },
+        "tg": {
+          "name": "Togo",
+          "value": 0,
+          "year": 2024
+        },
+        "th": {
+          "name": "Thailand",
+          "value": 38,
+          "year": 2024
+        },
+        "tj": {
+          "name": "Tajikistan",
+          "value": 7,
+          "year": 2024
+        },
+        "tm": {
+          "name": "Turkmenistan",
+          "value": 1,
+          "year": 2024
+        },
+        "tn": {
+          "name": "Tunisia",
+          "value": 18,
+          "year": 2024
+        },
+        "tp": {
+          "name": "Timor-Leste",
+          "value": 0,
+          "year": 2024
+        },
+        "tr": {
+          "name": "Turkey",
+          "value": 116,
+          "year": 2024
+        },
+        "tt": {
+          "name": "Trinidad and Tobago",
+          "value": 19,
+          "year": 2024
+        },
+        "tw": {
+          "name": "Taiwan",
+          "value": 0,
+          "year": 2024
+        },
+        "tz": {
+          "name": "Tanzania",
+          "value": 0,
+          "year": 2024
+        },
+        "ua": {
+          "name": "Ukraine",
+          "value": 167,
+          "year": 2024
+        },
+        "ug": {
+          "name": "Uganda",
+          "value": 13,
+          "year": 2024
+        },
+        "us": {
+          "name": "United States",
+          "value": 3091,
+          "year": 2024
+        },
+        "uy": {
+          "name": "Uruguay",
+          "value": 0,
+          "year": 2024
+        },
+        "uz": {
+          "name": "Uzbekistan",
+          "value": 53,
+          "year": 2024
+        },
+        "ve": {
+          "name": "Venezuela",
+          "value": 19,
+          "year": 2024
+        },
+        "vn": {
+          "name": "Vietnam",
+          "value": 0,
+          "year": 2024
+        },
+        "vu": {
+          "name": "Vanuatu",
+          "value": 0,
+          "year": 2024
+        },
+        "yf": {
+          "name": "Serbia",
+          "value": 29,
+          "year": 2024
+        },
+        "za": {
+          "name": "South Africa",
+          "value": 0,
+          "year": 2024
+        },
+        "zm": {
+          "name": "Zambia",
+          "value": 0,
+          "year": 2024
+        },
+        "zr": {
+          "name": "Democratic Republic of the Congo",
+          "value": 0,
+          "year": 2024
+        },
+        "zw": {
+          "name": "Zimbabwe",
+          "value": 0,
+          "year": 2024
+        }
+      }
+    }
+  },
+  "referenceYear": 2024,
+  "retrieved": "2026-08-22",
+  "source": "Craig Nevill-Manning's Medals per Capita",
+  "sourceUrl": "https://historical.medalspercapita.com/"
+}

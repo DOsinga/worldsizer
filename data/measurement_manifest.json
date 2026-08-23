@@ -1,15 +1,17 @@
 {
   "measurements": [
-    {"id": "Area", "label": "Area"},
-    {"id": "Population", "label": "Population"},
-    {"id": "Carbon Emissions", "label": "CO2 emissions"},
-    {"id": "Army Size", "label": "Active army size"},
-    {"id": "GDP (official exchange rate)", "label": "GDP (exchange rate)"},
-    {"id": "Living with Aids", "label": "Living with AIDS"},
-    {"id": "Exports", "label": "Exports"},
-    {"id": "Alcohol Consumption", "label": "Alcohol consumption"},
-    {"id": "Labor force", "label": "Labor force"},
-    {"id": "Olympic Medals", "label": "Olympic medals won"}
+    {"id": "Area", "label": "Area", "source": "World Bank", "sourceUrl": "https://data.worldbank.org/indicator/AG.SRF.TOTL.K2", "year": "2023"},
+    {"id": "Population", "label": "Population", "source": "World Bank", "sourceUrl": "https://data.worldbank.org/indicator/SP.POP.TOTL", "year": "2025"},
+    {"id": "CO2 emissions", "label": "CO2 emissions", "source": "EDGAR via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/EN.GHG.CO2.MT.CE.AR5", "year": "2024"},
+    {"id": "Armed forces", "label": "Armed forces personnel", "source": "IISS via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/MS.MIL.TOTL.P1", "year": "2020"},
+    {"id": "GDP", "label": "GDP", "source": "World Bank", "sourceUrl": "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD", "year": "2020–2025"},
+    {"id": "People living with HIV", "label": "People living with HIV", "source": "UNAIDS via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/SH.DYN.AIDS", "year": "2022–2024"},
+    {"id": "Exports", "label": "Exports", "source": "World Bank", "sourceUrl": "https://data.worldbank.org/indicator/NE.EXP.GNFS.CD", "year": "2020–2025"},
+    {"id": "Alcohol consumption", "label": "Alcohol consumption", "source": "WHO via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/SH.ALC.PCAP.LI", "year": "2019–2020"},
+    {"id": "Labor force", "label": "Labor force", "source": "ILO via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/SL.TLF.TOTL.IN", "year": "2021–2025"},
+    {"id": "Olympic medals", "label": "Olympic medals won", "source": "Craig Nevill-Manning's Medals per Capita", "sourceUrl": "https://historical.medalspercapita.com/", "year": "1896–2024"},
+    {"id": "Oil production", "label": "Oil production", "source": "U.S. EIA", "sourceUrl": "https://www.eia.gov/international/data/world/petroleum-and-other-liquids/annual-petroleum-and-other-liquids-production", "year": "2025"},
+    {"id": "Forest area", "label": "Forest area", "source": "FAO via World Bank", "sourceUrl": "https://data.worldbank.org/indicator/AG.LND.FRST.K2", "year": "2023"}
   ],
   "removed": [
     {

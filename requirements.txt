@@ -2,7 +2,7 @@
 #    uv pip compile requirements.in -o requirements.txt
 certifi==2026.7.22
     # via pyproj
-pillow==12.3.0
+pillow==13.0.0
     # via -r requirements.in
 pyproj==3.7.2
     # via -r requirements.in

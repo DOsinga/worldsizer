@@ -10,6 +10,13 @@ World Sizer and Gapmover are two views of one cartogram system:
 Cartograms are generated offline in Python. The browser loads precomputed
 coordinates and uses one small player to draw and animate both pages.
 
+## Run locally
+
+```bash
+uvx douwe worldsizer
+uvx douwe gapmover
+```
+
 ## Repository layout
 
 - `static/geometry.json` — canonical, content-versioned geometry

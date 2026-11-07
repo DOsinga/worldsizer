@@ -31,7 +31,13 @@ blog: 2016/1021
         padding: 18px 20px;
     }
 
-    .worldsizer-field label {
+    .worldsizer-field {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .worldsizer-field legend {
         display: block;
         margin-bottom: 6px;
         color: #777;
@@ -41,14 +47,43 @@ blog: 2016/1021
         letter-spacing: 0.04em;
     }
 
-    #measurement {
-        width: 100%;
-        padding: 10px 38px 10px 12px;
+    .worldsizer-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .worldsizer-options button {
+        min-height: 44px;
+        padding: 9px 12px;
         border: 1px solid #d6d6d6;
         border-radius: 8px;
         background: #fff;
         color: #424242;
         font: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .worldsizer-options button:hover:not(:disabled) {
+        border-color: #999;
+        background: #f9f9f9;
+    }
+
+    .worldsizer-options button[aria-pressed="true"] {
+        border-color: #f73859;
+        background: #f73859;
+        color: #fff;
+    }
+
+    .worldsizer-options button:focus-visible {
+        outline: 3px solid rgba(247, 56, 89, 0.28);
+        outline-offset: 2px;
+    }
+
+    .worldsizer-options button:disabled {
+        cursor: wait;
+        opacity: 0.7;
     }
 
     .worldsizer-meta {
@@ -137,38 +172,38 @@ blog: 2016/1021
         <canvas id="worldmap" width="720" height="540" aria-label="Cartogram of the world"></canvas>
     </div>
     <div class="worldsizer-controls">
-        <div class="worldsizer-field">
-            <label for="measurement">Size countries by</label>
-            <select id="measurement">
-                <option value="Area">Area</option>
-                <option value="Population">Population</option>
-                <option value="CO2 emissions">CO2 emissions</option>
-                <option value="Armed forces">Armed forces personnel</option>
-                <option value="GDP">GDP</option>
-                <option value="People living with HIV">People living with HIV</option>
-                <option value="Exports">Exports</option>
-                <option value="Alcohol consumption">Alcohol consumption</option>
-                <option value="Labor force">Labor force</option>
-                <option value="Olympic medals">Olympic medals won</option>
-                <option value="Oil production">Oil production</option>
-                <option value="Forest area">Forest area</option>
-            </select>
-        </div>
+        <fieldset class="worldsizer-field">
+            <legend>Size countries by</legend>
+            <div class="worldsizer-options">
+                <button type="button" data-measurement="Population" aria-pressed="true" disabled>Population</button>
+                <button type="button" data-measurement="CO2 emissions" aria-pressed="false" disabled>CO2 emissions</button>
+                <button type="button" data-measurement="Armed forces" aria-pressed="false" disabled>Armed forces personnel</button>
+                <button type="button" data-measurement="GDP" aria-pressed="false" disabled>GDP</button>
+                <button type="button" data-measurement="People living with HIV" aria-pressed="false" disabled>People living with HIV</button>
+                <button type="button" data-measurement="Exports" aria-pressed="false" disabled>Exports</button>
+                <button type="button" data-measurement="Alcohol consumption" aria-pressed="false" disabled>Alcohol consumption</button>
+                <button type="button" data-measurement="Labor force" aria-pressed="false" disabled>Labor force</button>
+                <button type="button" data-measurement="Olympic medals" aria-pressed="false" disabled>Olympic medals won</button>
+                <button type="button" data-measurement="Oil production" aria-pressed="false" disabled>Oil production</button>
+                <button type="button" data-measurement="Forest area" aria-pressed="false" disabled>Forest area</button>
+                <button type="button" data-measurement="Area" aria-pressed="false" disabled>Area</button>
+            </div>
+        </fieldset>
     </div>
 </div>
 
 <div class="worldsizer-meta">
     <span>
-        <span id="worldsizer-status">Geographic area</span>
+        <span id="worldsizer-status">Area represents population</span>
         <span aria-hidden="true"> · </span>
-        <a id="measurement-source" href="https://data.worldbank.org/indicator/AG.SRF.TOTL.K2">World Bank</a>
-        <span id="measurement-year">2023</span>
+        <a id="measurement-source" href="https://data.worldbank.org/indicator/SP.POP.TOTL">World Bank</a>
+        <span id="measurement-year">2025</span>
     </span>
     <span><a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a></span>
 </div>
 
 <div class="worldsizer-results">
-    <h2>Largest and smallest</h2>
+    <h2>Top 10 largest and smallest</h2>
     <table id="lowest-highest">
         <thead><tr><th colspan="2">Largest</th><th colspan="2">Smallest</th></tr></thead>
         <tbody></tbody>
@@ -178,33 +213,46 @@ blog: 2016/1021
 <script>
     async function initializeWorldSizer() {
         const staticRoot = '{% static "projects/worldsizer/" %}';
-        const [geometryResponse, pathsResponse, measurementsResponse] = await Promise.all([
+        const [geometryResponse, initialResponse] = await Promise.all([
             fetch(staticRoot + 'geometry.json'),
-            fetch(staticRoot + 'measurement_paths.json'),
-            fetch(staticRoot + 'measurements.json')
+            fetch(staticRoot + 'initial_population.json')
         ]);
-        if (![geometryResponse, pathsResponse, measurementsResponse].every(response => response.ok)) {
-            throw new Error('One or more cartogram files could not be loaded');
+        if (!geometryResponse.ok || !initialResponse.ok) {
+            throw new Error('The initial cartogram could not be loaded');
         }
         const geometry = await geometryResponse.json();
-        const pathData = await pathsResponse.json();
-        const measurements = await measurementsResponse.json();
-        if (geometry.version !== pathData.geometry) {
-            throw new Error('Measurement frames use incompatible geometry');
+        const initial = await initialResponse.json();
+        if (geometry.version !== initial.geometry) {
+            throw new Error('The initial cartogram uses incompatible geometry');
         }
 
         const player = new CartogramPlayer(document.getElementById('worldmap'), geometry, {
             fit: true,
             margin: 75
         });
+        player.setPoints(CartogramPlayer.scaledPoints(initial.points, initial.scale));
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const [pathsResponse, measurementsResponse] = await Promise.all([
+            fetch(staticRoot + 'measurement_paths.json'),
+            fetch(staticRoot + 'measurements.json')
+        ]);
+        if (!pathsResponse.ok || !measurementsResponse.ok) {
+            throw new Error('The cartogram data could not be loaded');
+        }
+        const pathData = await pathsResponse.json();
+        const measurements = await measurementsResponse.json();
+        if (geometry.version !== pathData.geometry) {
+            throw new Error('Measurement frames use incompatible geometry');
+        }
+
         const paths = new Map();
         const measurementMetadata = new Map(pathData.measurements.map(item => [item.id, item]));
         const countryNames = new Map(geometry.countries.map(country => [country.cc, country.name]));
-        const select = document.getElementById('measurement');
+        const buttons = Array.from(document.querySelectorAll('[data-measurement]'));
         const status = document.getElementById('worldsizer-status');
-        let currentKey = 'Area';
+        let currentKey = 'Population';
         let changing = false;
-        player.draw();
 
         function pathFor(key) {
             if (!paths.has(key)) {
@@ -215,6 +263,16 @@ blog: 2016/1021
             return paths.get(key);
         }
 
+        function buttonFor(field) {
+            return buttons.find(button => button.dataset.measurement === field);
+        }
+
+        function selectMeasurement(field) {
+            for (const button of buttons) {
+                button.setAttribute('aria-pressed', button.dataset.measurement === field);
+            }
+        }
+
         function updateTable(field) {
             const rows = Object.entries(measurements)
                 .filter(([, values]) => typeof values[field] === 'number' && values[field] > 1)
@@ -222,7 +280,7 @@ blog: 2016/1021
                 .sort((left, right) => right[1] - left[1]);
             const body = document.querySelector('#lowest-highest tbody');
             body.replaceChildren();
-            for (let index = 0; index < Math.min(5, Math.floor(rows.length / 2)); index++) {
+            for (let index = 0; index < Math.min(10, Math.floor(rows.length / 2)); index++) {
                 const row = document.createElement('tr');
                 const values = [rows[index][0], rows[index][1], rows[rows.length - 1 - index][0], rows[rows.length - 1 - index][1]];
                 for (const value of values) {
@@ -243,37 +301,38 @@ blog: 2016/1021
             document.getElementById('measurement-year').textContent = metadata.year;
         }
 
-        async function changeMeasurement() {
+        async function changeMeasurement(field) {
             if (changing) return;
-            const field = select.value;
-            const targetKey = field;
-            if (targetKey === currentKey) return;
+            if (field === currentKey) return;
             changing = true;
-            select.disabled = true;
+            selectMeasurement(field);
+            for (const button of buttons) button.disabled = true;
             status.textContent = 'Calculating transition…';
 
             const sequence = [];
             if (currentKey !== 'Area') {
                 sequence.push(...pathFor(currentKey).slice(0, -1).reverse(), geometry.points);
             }
-            if (targetKey !== 'Area') sequence.push(...pathFor(targetKey));
+            if (field !== 'Area') sequence.push(...pathFor(field));
             await player.animateSequence(sequence, 110);
-            currentKey = targetKey;
-            status.textContent = field === 'Area' ? 'Geographic area' : 'Area represents ' + select.options[select.selectedIndex].text.toLowerCase();
+            currentKey = field;
+            status.textContent = field === 'Area' ? 'Geographic area' : 'Area represents ' + buttonFor(field).textContent.toLowerCase();
             updateTable(field);
             updateMetadata(field);
             history.replaceState({state: field}, '', '?state=' + encodeURIComponent(field));
-            select.disabled = false;
+            for (const button of buttons) button.disabled = false;
             changing = false;
         }
 
-        select.addEventListener('change', changeMeasurement);
-        updateTable('Area');
+        for (const button of buttons) {
+            button.addEventListener('click', () => changeMeasurement(button.dataset.measurement));
+        }
+        updateTable('Population');
 
-        const initialState = '{{ state|default:"Area"|escapejs }}';
-        if (Array.from(select.options).some(option => option.value === initialState)) {
-            select.value = initialState;
-            if (initialState !== 'Area') await changeMeasurement();
+        const initialState = '{{ state|default:"Population"|escapejs }}';
+        for (const button of buttons) button.disabled = false;
+        if (buttonFor(initialState)) {
+            if (initialState !== 'Population') await changeMeasurement(initialState);
         }
     }
 

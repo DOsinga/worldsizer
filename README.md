@@ -21,6 +21,7 @@ uvx douwe gapmover
 
 - `static/geometry.json` — canonical, content-versioned geometry
 - `static/cartogram-player.js` — shared browser renderer and player
+- `static/initial_population.json` — finished Population map for the first paint
 - `static/population_frames.json` — generated Gapmover timeline
 - `baseline/population_frames.json.gz` — preserved legacy Gapmover timeline
 - `static/measurement_paths.json` — generated World Sizer relaxation paths

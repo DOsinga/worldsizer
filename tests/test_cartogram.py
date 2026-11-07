@@ -69,6 +69,7 @@ class CartogramTest(unittest.TestCase):
 
     def test_generated_assets_match_geometry(self):
         population = load("static/population_frames.json")
+        initial_population = load("static/initial_population.json")
         paths = load("static/measurement_paths.json")
         manifest = load("data/measurement_manifest.json")
         point_count = len(self.geometry["points"])
@@ -77,6 +78,7 @@ class CartogramTest(unittest.TestCase):
         self.assertEqual(len(self.geometry["countries"]), 175)
         self.assertEqual(point_count, 7491)
         self.assertEqual(population["geometry"], self.geometry["version"])
+        self.assertEqual(initial_population["geometry"], self.geometry["version"])
         self.assertEqual(paths["geometry"], self.geometry["version"])
         self.assertEqual(population["solverBridges"], "canonical")
         self.assertEqual(population["mode"], "independent")
@@ -102,6 +104,20 @@ class CartogramTest(unittest.TestCase):
                 for frame in path
             )
         )
+
+        population_points = [
+            [round(x * paths["scale"]), round(y * paths["scale"])]
+            for x, y in self.geometry["points"]
+        ]
+        for frame in paths["paths"]["Population"]:
+            population_points = [
+                [
+                    point[0] + frame[index * 2],
+                    point[1] + frame[index * 2 + 1],
+                ]
+                for index, point in enumerate(population_points)
+            ]
+        self.assertEqual(initial_population["points"], population_points)
 
         points_2080 = [
             [x / population["scale"], y / population["scale"]]

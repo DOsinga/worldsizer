@@ -150,6 +150,7 @@ def generate_measurements(args):
     measurements = canonical_codes(load_json(ROOT / "data/measurements.json"), mappings)
     manifest = load_json(ROOT / "data/measurement_manifest.json")
     paths = {}
+    initial_population = None
 
     for measurement in manifest["measurements"]:
         field = measurement["id"]
@@ -163,6 +164,8 @@ def generate_measurements(args):
         ))
         frames = solver.run(args.ticks, args.capture_every)
         paths[field] = delta_frames(geometry["points"], frames, args.scale)
+        if field == "Population":
+            initial_population = quantize(frames[-1], args.scale)
 
     output = {
         "geometry": geometry["version"],
@@ -176,6 +179,11 @@ def generate_measurements(args):
         "paths": paths,
     }
     write_json(ROOT / args.output, output)
+    write_json(ROOT / "static/initial_population.json", {
+        "geometry": geometry["version"],
+        "scale": args.scale,
+        "points": initial_population,
+    })
     write_json(ROOT / "static/measurements.json", measurements)
 
 

@@ -39,6 +39,10 @@
     "path": "static/measurement_paths.json",
     "sha256": "5380ee4737c1c25ec6b9281938956abcf30d5786b9ee73669e4109c295b120ed"
   },
+  "initialPopulation": {
+    "path": "static/initial_population.json",
+    "sha256": "6b58dca7460c9ad62c9b872b81a483a70904548cf87f83026bdef89aed4b9be3"
+  },
   "servedMeasurements": {
     "path": "static/measurements.json",
     "sha256": "4e91733f8aa969d31190a8506813a4e5be04546b874f5c7270e7c73ea1afe9b4"
